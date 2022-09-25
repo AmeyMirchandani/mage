@@ -83,7 +83,7 @@ public class VerifyCardDataTest {
     private static final List<String> evergreenKeywords = Arrays.asList(
             "flying", "lifelink", "menace", "trample", "haste", "first strike", "hexproof", "fear",
             "deathtouch", "double strike", "indestructible", "reach", "flash", "defender", "vigilance",
-            "plainswalk", "islandwalk", "swampwalk", "mountainwalk", "forestwalk"
+            "plainswalk", "islandwalk", "swampwalk", "mountainwalk", "forestwalk", "myriad"
     );
 
     static {
@@ -262,12 +262,12 @@ public class VerifyCardDataTest {
         int cardIndex = 0;
         for (Card card : CardScanner.getAllCards()) {
             cardIndex++;
-            if (card instanceof SplitCard) {
-                check(((SplitCard) card).getLeftHalfCard(), cardIndex);
-                check(((SplitCard) card).getRightHalfCard(), cardIndex);
-            } else if (card instanceof ModalDoubleFacesCard) {
-                check(((ModalDoubleFacesCard) card).getLeftHalfCard(), cardIndex);
-                check(((ModalDoubleFacesCard) card).getRightHalfCard(), cardIndex);
+            if (card instanceof CardWithHalves) {
+                check(((CardWithHalves) card).getLeftHalfCard(), cardIndex);
+                check(((CardWithHalves) card).getRightHalfCard(), cardIndex);
+            } else if (card instanceof AdventureCard) {
+                check(card, cardIndex);
+                check(((AdventureCard) card).getSpellCard(), cardIndex);
             } else {
                 check(card, cardIndex);
             }
@@ -870,19 +870,23 @@ public class VerifyCardDataTest {
             // TODO: add test to check num cards (hasBasicLands and numLand > 0)
         }
 
-        // CHECK: wrong snow land info
+        // CHECK: wrong snow land info - set needs to have exclusively snow basics to qualify
         for (ExpansionSet set : sets) {
             boolean needSnow = CardRepository.haveSnowLands(set.getCode());
             boolean haveSnow = false;
+            boolean haveNonSnow = false;
             for (ExpansionSet.SetCardInfo card : set.getSetCardInfo()) {
                 if (card.getName().startsWith("Snow-Covered ")) {
                     haveSnow = true;
+                }
+                if (isNonSnowBasicLandName(card.getName())) {
+                    haveNonSnow = true;
                     break;
                 }
             }
-            if (needSnow != haveSnow) {
+            if (needSnow != (haveSnow && !haveNonSnow)) {
                 errorsList.add("Error: found incorrect snow land info in set " + set.getCode() + ": "
-                        + (haveSnow ? "set has snow cards" : "set doesn't have snow card")
+                        + ((haveSnow && !haveNonSnow) ? "set has exclusively snow basics" : "set doesn't have exclusively snow basics")
                         + ", but xmage thinks that it " + (needSnow ? "does" : "doesn't"));
             }
         }
@@ -1403,14 +1407,15 @@ public class VerifyCardDataTest {
             fail(card, "abilities", "card is a front face werewolf with a back face ability");
         }
 
+        // special check: transform ability in MDFC should only be on front and vice versa
         if (card.getSecondCardFace() != null && !card.isNightCard() && !card.getAbilities().containsClass(TransformAbility.class)) {
             fail(card, "abilities", "double-faced cards should have transform ability on the front");
         }
-
         if (card.getSecondCardFace() != null && card.isNightCard() && card.getAbilities().containsClass(TransformAbility.class)) {
             fail(card, "abilities", "double-faced cards should not have transform ability on the back");
         }
 
+        // special check: back side in MDFC must be only night card
         if (card.getSecondCardFace() != null && !card.getSecondCardFace().isNightCard()) {
             fail(card, "abilities", "the back face of a double-faced card should be nightCard = true");
         }
@@ -1672,9 +1677,25 @@ public class VerifyCardDataTest {
             refRules[i] = prepareRule(card.getName(), refRules[i]);
         }
 
+        if (ref.subtypes.contains("Adventure")) {
+            for (int i = 0; i < refRules.length; i++) {
+                refRules[i] = new StringBuilder("Adventure ")
+                        .append(ref.types.get(0))
+                        .append(" - ")
+                        .append(ref.faceName)
+                        .append(' ')
+                        .append(ref.manaCost)
+                        .append(" - ")
+                        .append(refRules[i])
+                        .toString();
+            }
+        }
+
+
         String[] cardRules = card
                 .getRules()
                 .stream()
+                .filter(s -> !(card instanceof AdventureCard) || !s.startsWith("Adventure "))
                 .collect(Collectors.joining("\n"))
                 .replace("<br>", "\n")
                 .replace("<br/>", "\n")
@@ -1804,6 +1825,14 @@ public class VerifyCardDataTest {
                 || checkName.equals("Mountain");
     }
 
+    private boolean isNonSnowBasicLandName(String name) {
+        return name.equals("Island")
+                || name.equals("Forest")
+                || name.equals("Swamp")
+                || name.equals("Plains")
+                || name.equals("Mountain");
+    }
+
     private void checkBasicLands(Card card, MtgJsonCard ref) {
 
         // basic lands must have Rarity.LAND and SuperType.BASIC
@@ -1906,9 +1935,9 @@ public class VerifyCardDataTest {
                 // same find code as original cube
                 CardInfo cardInfo;
                 if (!cardId.getExtension().isEmpty()) {
-                    cardInfo = CardRepository.instance.findCardWPreferredSet(cardId.getName(), cardId.getExtension(), false);
+                    cardInfo = CardRepository.instance.findCardWPreferredSet(cardId.getName(), cardId.getExtension());
                 } else {
-                    cardInfo = CardRepository.instance.findPreferredCoreExpansionCard(cardId.getName(), false);
+                    cardInfo = CardRepository.instance.findPreferredCoreExpansionCard(cardId.getName());
                 }
                 if (cardInfo == null) {
                     errorsList.add("Error: broken cube, can't find card: " + cube.getClass().getCanonicalName() + " - " + cardId.getName());

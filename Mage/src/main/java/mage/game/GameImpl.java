@@ -15,6 +15,7 @@ import mage.abilities.effects.PreventionEffectData;
 import mage.abilities.effects.common.CopyEffect;
 import mage.abilities.effects.common.InfoEffect;
 import mage.abilities.effects.keyword.ShieldCounterEffect;
+import mage.abilities.effects.keyword.StunCounterEffect;
 import mage.abilities.keyword.*;
 import mage.abilities.mana.DelayedTriggeredManaAbility;
 import mage.abilities.mana.TriggeredManaAbility;
@@ -651,20 +652,32 @@ public abstract class GameImpl implements Game {
         return state.getStack().getSpell(spellId);
     }
 
+    /**
+     * Given the UUID of a spell, this method returns the spell object. If the current game
+     * state does not contain a spell with the given UUID, this method checks the last known
+     * information on the stack to look for the spell.
+     *
+     * @param spellId - The UUID of a spell to retrieve from the current game state
+     * @return - The spell object with the given UUID, or null if no spell with the given UUID
+     * is found
+     */
     @Override
     public Spell getSpellOrLKIStack(UUID spellId) {
         Spell spell = state.getStack().getSpell(spellId);
         if (spell == null) {
             MageObject obj = this.getLastKnownInformation(spellId, Zone.STACK);
+            // Copied activated abilities may also be retrieved from the stack here.
+            // This check that obj is instanceof Spell is necessary to avoid throwing
+            // a ClassCastException, as a StackAbility cannot be cast to Spell. See
+            // SyrCarahTheBoldTest.java for an example of when this check is relevant.
             if (obj instanceof Spell) {
                 spell = (Spell) obj;
-            } else {
-                if (obj != null) {
-                    // copied activated abilities is StackAbility (not spell) and must be ignored here
-                    // if not then java.lang.ClassCastException: mage.game.stack.StackAbility cannot be cast to mage.game.stack.Spell
-                    // see SyrCarahTheBoldTest as example
-                    // logger.error("getSpellOrLKIStack got non spell id - " + obj.getClass().getName() + " - " + obj.getName(), new Throwable());
-                }
+            } else if (obj != null) {
+                logger.error(String.format(
+                        "getSpellOrLKIStack got non-spell id %s correlating to non-spell object %s.",
+                        obj.getClass().getName(), obj.getName()),
+                        new Throwable()
+                );
             }
         }
         return spell;
@@ -724,10 +737,6 @@ public abstract class GameImpl implements Game {
         return Optional.empty();
     }
 
-    //    @Override
-//    public Zone getZone(UUID objectId) {
-//        return state.getZone(objectId);
-//    }
     @Override
     public void setZone(UUID objectId, Zone zone) {
         state.setZone(objectId, zone);
@@ -752,30 +761,6 @@ public abstract class GameImpl implements Game {
         }
     }
 
-    //    /**
-//     * Starts check if game is over or if playerId is given let the player
-//     * concede.
-//     *
-//     * @param playerId
-//     * @return
-//     */
-//    @Override
-//    public synchronized boolean gameOver(UUID playerId) {
-//        if (playerId == null) {
-//            boolean result = checkIfGameIsOver();
-//            return result;
-//        } else {
-//            logger.debug("Game over for player Id: " + playerId + " gameId " + getId());
-//            concedingPlayers.add(playerId);
-//            Player player = getPlayer(state.getPriorityPlayerId());
-//            if (player != null && player.isHuman()) {
-//                player.signalPlayerConcede();
-//            } else {
-//                checkConcede();
-//            }
-//            return true;
-//        }
-//    }
     @Override
     public void setConcedingPlayer(UUID playerId) {
         Player player = null;
@@ -1138,6 +1123,9 @@ public abstract class GameImpl implements Game {
 
         // Apply shield counter mechanic from SNC
         state.addAbility(new SimpleStaticAbility(Zone.ALL, new ShieldCounterEffect()), null);
+
+        // Apply stun counter mechanic
+        state.addAbility(new SimpleStaticAbility(Zone.ALL, new StunCounterEffect()), null);
 
         // Handle companions
         Map<Player, Card> playerCompanionMap = new HashMap<>();
@@ -1963,12 +1951,12 @@ public abstract class GameImpl implements Game {
         }
         if (ability instanceof TriggeredManaAbility || ability instanceof DelayedTriggeredManaAbility) {
             // 20110715 - 605.4
-            Ability manaAbiltiy = ability.copy();
-            if (manaAbiltiy.getSourceObjectZoneChangeCounter() == 0) {
-                manaAbiltiy.setSourceObjectZoneChangeCounter(getState().getZoneChangeCounter(ability.getSourceId()));
+            Ability manaAbility = ability.copy();
+            if (manaAbility.getSourceObjectZoneChangeCounter() == 0) {
+                manaAbility.setSourceObjectZoneChangeCounter(getState().getZoneChangeCounter(ability.getSourceId()));
             }
-            manaAbiltiy.activate(this, false);
-            manaAbiltiy.resolve(this);
+            manaAbility.activate(this, false);
+            manaAbility.resolve(this);
         } else {
             TriggeredAbility newAbility = ability.copy();
             newAbility.newId();
@@ -2583,7 +2571,7 @@ public abstract class GameImpl implements Game {
                 filterLegendName.add(SuperType.LEGENDARY.getPredicate());
                 filterLegendName.add(new NamePredicate(legend.getName()));
                 filterLegendName.add(new ControllerIdPredicate(legend.getControllerId()));
-                if (getBattlefield().contains(filterLegendName, null, legend.getControllerId(), null, this, 2)) {
+                if (getBattlefield().contains(filterLegendName, legend.getControllerId(), null, this, 2)) {
                     if (!replaceEvent(GameEvent.getEvent(GameEvent.EventType.DESTROY_PERMANENT_BY_LEGENDARY_RULE, legend.getId(), legend.getControllerId()))) {
                         Player controller = this.getPlayer(legend.getControllerId());
                         if (controller != null) {
@@ -3353,7 +3341,7 @@ public abstract class GameImpl implements Game {
                                 String[] s = command.getValue().split(":");
                                 if (s.length == 2) {
                                     try {
-                                        Integer amount = Integer.parseInt(s[1]);
+                                        int amount = Integer.parseInt(s[1]);
                                         player.setLife(amount, this, null);
                                         logger.debug("Setting player's life: ");
                                     } catch (NumberFormatException e) {
@@ -3703,11 +3691,17 @@ public abstract class GameImpl implements Game {
 
     @Override
     public void takeInitiative(Ability source, UUID initiativeId) {
-        if (getInitiativeId() == null) {
+        // First time someone takes the initiative
+        if (getInitiativeId() == null) { // 1. Nobody has initiative
             getState().addDesignation(new Initiative(), this, initiativeId);
-        } else if (!getInitiativeId().equals(initiativeId)) {
-            getState().setInitiativeId(initiativeId);
         }
+
+        // Update it every time, even if it doesn't have to change to make the code simpler.
+        // It only really has to change under 2 circumstances:
+        //      1. First time someone takes the initiative
+        //      2. A player taking the initiative when another player currently has it.
+        getState().setInitiativeId(initiativeId);
+
         informPlayers(getPlayer(initiativeId).getLogName() + " takes the initiative");
         fireEvent(new GameEvent(GameEvent.EventType.TOOK_INITIATIVE, initiativeId, source, initiativeId));
     }
@@ -3769,7 +3763,7 @@ public abstract class GameImpl implements Game {
     public boolean isGameStopped() {
         return gameStopped;
     }
-    
+
     @Override
     public boolean isTurnOrderReversed() {
         return state.getReverseTurnOrder();

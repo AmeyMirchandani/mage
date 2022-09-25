@@ -102,6 +102,7 @@ public class GameEvent implements Serializable {
         DAMAGE_PLAYER,
         MILL_CARDS,
         MILLED_CARD,
+        MILLED_CARDS,
         /* DAMAGED_PLAYER
          targetId    the id of the damaged player
          sourceId    sourceId of the ability which caused the damage
@@ -297,6 +298,7 @@ public class GameEvent implements Serializable {
          */
         BLOCKER_DECLARED,
         CREATURE_BLOCKED,
+        CREATURE_BLOCKS,
         BATCH_BLOCK_NONCOMBAT,
         UNBLOCKED_ATTACKER,
         SEARCH_LIBRARY, LIBRARY_SEARCHED,
@@ -353,6 +355,14 @@ public class GameEvent implements Serializable {
         BECOMES_EXERTED,
         BECOMES_RENOWNED,
         GAINS_CLASS_LEVEL,
+        /* CREATURE_ENLISTED
+         targetId    id of the enlisted creature
+         sourceId    id of the creature that enlisted
+         playerId    player who controls the creatures
+         amount      not used for this event
+         flag        not used for this event
+         */
+        CREATURE_ENLISTED,
         /* BECOMES_MONARCH
          targetId    playerId of the player that becomes the monarch
          sourceId    id of the source object that created that effect, if no effect exist it's null

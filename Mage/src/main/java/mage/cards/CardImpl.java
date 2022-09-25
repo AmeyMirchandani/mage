@@ -8,7 +8,6 @@ import mage.abilities.common.SimpleStaticAbility;
 import mage.abilities.effects.common.continuous.HasSubtypesSourceEffect;
 import mage.abilities.keyword.ChangelingAbility;
 import mage.abilities.keyword.FlashbackAbility;
-import mage.abilities.keyword.ReconfigureAbility;
 import mage.abilities.mana.ActivatedManaAbilityImpl;
 import mage.cards.repository.PluginClassloaderRegistery;
 import mage.constants.*;
@@ -31,6 +30,7 @@ import org.apache.log4j.Logger;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
+import mage.abilities.keyword.ReconfigureAbility;
 
 public abstract class CardImpl extends MageObjectImpl implements Card {
 
@@ -637,6 +637,15 @@ public abstract class CardImpl extends MageObjectImpl implements Card {
     }
 
     @Override
+    public SpellAbility getSecondFaceSpellAbility() {
+        Card secondFace = getSecondCardFace();
+        if (secondFace == null || secondFace.getClass().equals(getClass())) {
+            throw new IllegalArgumentException("Wrong code usage. getSecondFaceSpellAbility can only be used for double faced card (main side).");
+        }
+        return secondFace.getSpellAbility();
+    }
+
+    @Override
     public boolean isNightCard() {
         return this.nightCard;
     }
@@ -699,6 +708,12 @@ public abstract class CardImpl extends MageObjectImpl implements Card {
     }
 
     public boolean addCounters(Counter counter, UUID playerAddingCounters, Ability source, Game game, List<UUID> appliedEffects, boolean isEffect, int maxCounters) {
+        if (this instanceof Permanent) {
+            if (!((Permanent) this).isPhasedIn()) {
+                return false;
+            }
+        }
+
         boolean returnCode = true;
         GameEvent addingAllEvent = GameEvent.getEvent(GameEvent.EventType.ADD_COUNTERS, objectId, source, playerAddingCounters, counter.getName(), counter.getCount());
         addingAllEvent.setAppliedEffects(appliedEffects);
@@ -821,9 +836,8 @@ public abstract class CardImpl extends MageObjectImpl implements Card {
             return false;
         }
         if (attachment.hasSubtype(SubType.EQUIPMENT, game)
-                && (attachment.isCreature(game)
-                && !attachment.getAbilities(game).containsClass(ReconfigureAbility.class)
-                || !this.isCreature(game))) {
+                && (attachment.isCreature(game)  // seems strange and perhaps someone knows why this is checked.
+                && !attachment.getAbilities(game).containsClass(ReconfigureAbility.class))) {
             return false;
         }
         if (attachment.hasSubtype(SubType.FORTIFICATION, game)

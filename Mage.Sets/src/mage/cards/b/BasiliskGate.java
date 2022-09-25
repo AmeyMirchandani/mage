@@ -2,6 +2,7 @@ package mage.cards.b;
 
 import mage.abilities.Ability;
 import mage.abilities.common.ActivateAsSorceryActivatedAbility;
+import mage.abilities.costs.common.TapSourceCost;
 import mage.abilities.costs.mana.GenericManaCost;
 import mage.abilities.dynamicvalue.DynamicValue;
 import mage.abilities.dynamicvalue.common.PermanentsOnBattlefieldCount;
@@ -25,7 +26,7 @@ import java.util.UUID;
 public final class BasiliskGate extends CardImpl {
 
     private static final DynamicValue xValue = new PermanentsOnBattlefieldCount(
-            new FilterControlledPermanent(SubType.GATE, "Gates you control")
+            new FilterControlledPermanent(SubType.GATE, "Gates you control"), null
     );
     private static final Hint hint = new ValueHint("Gates you control", xValue);
 
@@ -38,11 +39,14 @@ public final class BasiliskGate extends CardImpl {
         this.addAbility(new ColorlessManaAbility());
 
         // {2}, {T}: Target creature gets +X/+X until end of turn, where X is the number of Gates you control. Activate only as a sorcery.
-        Ability ability = new ActivateAsSorceryActivatedAbility(new BoostTargetEffect(
-                xValue, xValue, Duration.EndOfTurn, true
-        ), new GenericManaCost(2));
+        Ability ability = new ActivateAsSorceryActivatedAbility(
+                new BoostTargetEffect(xValue, xValue, Duration.EndOfTurn),
+                new GenericManaCost(2)
+        );
+        ability.addCost(new TapSourceCost());
         ability.addTarget(new TargetCreaturePermanent());
-        this.addAbility(ability.addHint(hint));
+        ability.addHint(hint);
+        this.addAbility(ability);
     }
 
     private BasiliskGate(final BasiliskGate card) {
