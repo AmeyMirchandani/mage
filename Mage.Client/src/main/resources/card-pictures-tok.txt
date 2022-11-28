@@ -137,6 +137,7 @@
 |Generate|EMBLEM:2X2|Wrenn and Six||Emblem Wrenn|WrennAndSixEmblem|
 |Generate|EMBLEM:DMU|Ajani, Sleeper Agent||Emblem Ajani|AjaniSleeperAgentEmblem|
 |Generate|EMBLEM:DMU|Jaya, Fiery Negotiator||Emblem Jaya|JayaFieryNegotiatorEmblem|
+|Generate|EMBLEM:BRO|Saheeli, Filigree Master||Emblem Saheeli|SaheeliFiligreeMasterEmblem|
 
 # Planes
 |Generate|PLANE:PCA|Plane - Academy at Tolaria West|||AcademyAtTolariaWestPlane|
@@ -1907,3 +1908,61 @@
 |Generate|TOK:DMC|Wurm|||Wurm44Token|
 |Generate|TOK:DMC|Zombie|||ZombieToken|
 |Generate|TOK:DMC|Zombie Knight|||ZombieKnightToken|
+
+# GN3
+|Generate|TOK:GN3|Angel|||AngelToken|
+|Generate|TOK:GN3|Bird Illusion|||BirdIllusionToken|
+|Generate|TOK:GN3|Demon|||DemonToken|
+|Generate|TOK:GN3|Dragon|||DragonEggDragonToken|
+|Generate|TOK:GN3|Drake|||DrakeToken|
+|Generate|TOK:GN3|Elf Warrior|||ElfWarriorToken|
+|Generate|TOK:GN3|Human Soldier|||HumanSoldierToken|
+|Generate|TOK:GN3|Soldier|||SoldierToken|
+|Generate|TOK:GN3|Treasure|||TreasureToken|
+|Generate|TOK:GN3|Zombie|||ZombieToken|
+
+# 40K
+|Generate|TOK:40K|Astartes Warrior|1||BlackAstartesWarriorToken|
+|Generate|TOK:40K|Astartes Warrior|2||WhiteAstartesWarriorToken|
+|Generate|TOK:40K|Blue Horror|||BlueHorrorToken|
+|Generate|TOK:40K|Cherubael|||CherubaelToken|
+|Generate|TOK:40K|Clue|||ClueArtifactToken|
+|Generate|TOK:40K|Insect|||InsectColorlessToken|
+|Generate|TOK:40K|Necron Warrior|||NecronWarriorToken|
+|Generate|TOK:40K|Plaguebearer of Nurgle|||PlaguebearerOfNurgleToken|
+|Generate|TOK:40K|Robot|||RobotToken|
+|Generate|TOK:40K|Soldier|1||SoldierToken|
+|Generate|TOK:40K|Soldier|2||SoldierToken|
+|Generate|TOK:40K|Soldier|3||SoldierToken|
+|Generate|TOK:40K|Spawn|||SpawnToken|
+|Generate|TOK:40K|Tyranid|1||TyranidToken|
+|Generate|TOK:40K|Tyranid|2||Tyranid55Token|
+|Generate|TOK:40K|Tyranid Gargoyle|||TyranidGargoyleToken|
+|Generate|TOK:40K|Tyranid Warrior|||TyranidWarriorToken|
+
+# BRO
+|Generate|TOK:BRO|Bear|||BearToken|
+|Generate|TOK:BRO|Construct|1||KarnConstructToken|
+|Generate|TOK:BRO|Construct|2||Construct2Token|
+|Generate|TOK:BRO|Forest Dryad|||ForestDryadToken|
+|Generate|TOK:BRO|Golem|||GolemXXToken|
+|Generate|TOK:BRO|Powerstone|||PowerstoneToken|
+|Generate|TOK:BRO|Soldier|1||SoldierArtifactToken|
+|Generate|TOK:BRO|Soldier|2||SoldierArtifactToken|
+|Generate|TOK:BRO|Spirit|||SpiritTeferiToken|
+|Generate|TOK:BRO|Thopter|||ThopterColorlessToken|
+|Generate|TOK:BRO|Zombie|||AshnodZombieToken|
+
+# BRC
+|Generate|TOK:BRC|Construct|||ConstructToken|
+|Generate|TOK:BRC|Eldrazi|||EldraziToken|
+|Generate|TOK:BRC|Elemental|||TitaniaProtectorOfArgothElementalToken|
+|Generate|TOK:BRC|Faerie|||FaerieToken|
+|Generate|TOK:BRC|Goat|||GoatToken|
+|Generate|TOK:BRC|Inkling|||InklingToken|
+|Generate|TOK:BRC|Myr|||MyrToken|
+|Generate|TOK:BRC|Phyrexian Horror|||PhyrexianRebirthHorrorToken|
+|Generate|TOK:BRC|Phyrexian Myr|||BrudicladTelchorMyrToken|
+|Generate|TOK:BRC|Scrap|||ScrapToken|
+|Generate|TOK:BRC|Servo|||ServoToken|
+|Generate|TOK:BRC|Thopter|||ThopterToken|

@@ -36,6 +36,7 @@ import mage.filter.StaticFilters;
 import mage.filter.common.FilterCreaturePermanent;
 import mage.filter.predicate.mageobject.NamePredicate;
 import mage.filter.predicate.permanent.ControllerIdPredicate;
+import mage.filter.predicate.permanent.LegendRuleAppliesPredicate;
 import mage.game.combat.Combat;
 import mage.game.command.*;
 import mage.game.command.dungeons.UndercityDungeon;
@@ -1984,10 +1985,7 @@ public abstract class GameImpl implements Game {
             newAbility.setSourceObjectZoneChangeCounter(getState().getZoneChangeCounter(source.getSourceId()));
             newAbility.setSourcePermanentTransformCount(this);
         }
-        newAbility.initOnAdding(this);
-        // ability.init is called as the ability triggeres not now.
-        // If a FixedTarget pointer is already set from the effect setting up this delayed ability
-        // it has to be already initialized so it won't be overwitten as the ability triggers
+        newAbility.init(this);
         getState().addDelayedTriggeredAbility(newAbility);
         return newAbility.getId();
     }
@@ -2478,7 +2476,7 @@ public abstract class GameImpl implements Game {
                     somethingHappened = true;
                 }
             }
-            if (this.getState().isLegendaryRuleActive() && StaticFilters.FILTER_PERMANENT_LEGENDARY.match(perm, this)) {
+            if (perm.isLegendary() && perm.legendRuleApplies()) {
                 legendary.add(perm);
             }
             if (StaticFilters.FILTER_PERMANENT_EQUIPMENT.match(perm, this)) {
@@ -2571,22 +2569,24 @@ public abstract class GameImpl implements Game {
                 filterLegendName.add(SuperType.LEGENDARY.getPredicate());
                 filterLegendName.add(new NamePredicate(legend.getName()));
                 filterLegendName.add(new ControllerIdPredicate(legend.getControllerId()));
-                if (getBattlefield().contains(filterLegendName, legend.getControllerId(), null, this, 2)) {
-                    if (!replaceEvent(GameEvent.getEvent(GameEvent.EventType.DESTROY_PERMANENT_BY_LEGENDARY_RULE, legend.getId(), legend.getControllerId()))) {
-                        Player controller = this.getPlayer(legend.getControllerId());
-                        if (controller != null) {
-                            Target targetLegendaryToKeep = new TargetPermanent(filterLegendName);
-                            targetLegendaryToKeep.setTargetName(legend.getName() + " to keep (Legendary Rule)?");
-                            controller.chooseTarget(Outcome.Benefit, targetLegendaryToKeep, null, this);
-                            for (Permanent dupLegend : getBattlefield().getActivePermanents(filterLegendName, legend.getControllerId(), this)) {
-                                if (!targetLegendaryToKeep.getTargets().contains(dupLegend.getId())) {
-                                    movePermanentToGraveyardWithInfo(dupLegend);
-                                }
-                            }
-                        }
-                        return true;
+                filterLegendName.add(LegendRuleAppliesPredicate.instance);
+                if (!getBattlefield().contains(filterLegendName, legend.getControllerId(), null, this, 2)) {
+                    continue;
+                }
+                Player controller = this.getPlayer(legend.getControllerId());
+                if (controller == null) {
+                    continue;
+                }
+                Target targetLegendaryToKeep = new TargetPermanent(filterLegendName);
+                targetLegendaryToKeep.setNotTarget(true);
+                targetLegendaryToKeep.setTargetName(legend.getName() + " to keep (Legendary Rule)?");
+                controller.choose(Outcome.Benefit, targetLegendaryToKeep, null, this);
+                for (Permanent dupLegend : getBattlefield().getActivePermanents(filterLegendName, legend.getControllerId(), this)) {
+                    if (!targetLegendaryToKeep.getTargets().contains(dupLegend.getId())) {
+                        movePermanentToGraveyardWithInfo(dupLegend);
                     }
                 }
+                return true;
             }
         }
         //704.5k  - World Enchantments
