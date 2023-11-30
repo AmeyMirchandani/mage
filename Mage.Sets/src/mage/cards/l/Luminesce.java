@@ -43,13 +43,8 @@ class LuminescePreventionEffect extends PreventionEffectImpl {
         staticText = "Prevent all damage that black sources and red sources would deal this turn";
     }
 
-    public LuminescePreventionEffect(LuminescePreventionEffect effect) {
+    private LuminescePreventionEffect(final LuminescePreventionEffect effect) {
         super(effect);
-    }
-
-    @Override
-    public boolean apply(Game game, Ability source) {
-        return true;
     }
 
     @Override

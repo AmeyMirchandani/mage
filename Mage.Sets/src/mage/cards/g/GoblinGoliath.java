@@ -61,7 +61,7 @@ class GoblinGoliathDamageEffect extends ReplacementEffectImpl {
         staticText = "If a source you control would deal damage to an opponent this turn, it deals double that damage to that player instead.";
     }
 
-    public GoblinGoliathDamageEffect(final GoblinGoliathDamageEffect effect) {
+    private GoblinGoliathDamageEffect(final GoblinGoliathDamageEffect effect) {
         super(effect);
     }
 
@@ -90,11 +90,6 @@ class GoblinGoliathDamageEffect extends ReplacementEffectImpl {
             }
         }
         return false;
-    }
-
-    @Override
-    public boolean apply(Game game, Ability source) {
-        return true;
     }
 
     @Override

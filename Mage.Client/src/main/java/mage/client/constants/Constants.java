@@ -51,7 +51,6 @@ public final class Constants {
 
     // cards render
     public static final Rectangle CARD_SIZE_FULL = new Rectangle(101, 149);
-    public static final Rectangle THUMBNAIL_SIZE_FULL = new Rectangle(102, 146);
 
     // resources - default images
     public static final String RESOURCE_PATH_DEFAULT_IMAGES = File.separator + "default";
@@ -105,6 +104,7 @@ public final class Constants {
 
         FREE_BUILDING,
         LIMITED_BUILDING,
+        LIMITED_SIDEBOARD_BUILDING,
         SIDEBOARDING,
         VIEW_LIMITED_DECK
     }

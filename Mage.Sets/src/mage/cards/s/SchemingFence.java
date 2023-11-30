@@ -65,7 +65,7 @@ class SchemingFenceChooseEffect extends OneShotEffect {
         this.staticText = "you may choose a nonland permanent";
     }
 
-    public SchemingFenceChooseEffect(final SchemingFenceChooseEffect effect) {
+    private SchemingFenceChooseEffect(final SchemingFenceChooseEffect effect) {
         super(effect);
     }
 
@@ -109,18 +109,13 @@ class SchemingFenceDisableEffect extends ContinuousRuleModifyingEffectImpl {
         staticText = "activated abilities of the chosen permanent can't be activated";
     }
 
-    public SchemingFenceDisableEffect(final SchemingFenceDisableEffect effect) {
+    private SchemingFenceDisableEffect(final SchemingFenceDisableEffect effect) {
         super(effect);
     }
 
     @Override
     public SchemingFenceDisableEffect copy() {
         return new SchemingFenceDisableEffect(this);
-    }
-
-    @Override
-    public boolean apply(Game game, Ability source) {
-        return true;
     }
 
     @Override
@@ -189,7 +184,7 @@ class SchemingFenceGainEffect extends ContinuousEffectImpl {
             if (!(ability instanceof LoyaltyAbility)) {
                 Ability copied = ability.copy();
                 ability.getEffects().setValue("schemingFence", source.getSourceId());
-                permanent.addAbility(copied, source.getSourceId(), game);
+                permanent.addAbility(copied, source.getSourceId(), game, true);
             }
         }
         return true;

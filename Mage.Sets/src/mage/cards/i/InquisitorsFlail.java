@@ -53,7 +53,7 @@ class InquisitorsFlailEffect extends ReplacementEffectImpl {
                 + "If another creature would deal combat damage to equipped creature, it deals double that damage to equipped creature instead";
     }
 
-    public InquisitorsFlailEffect(final InquisitorsFlailEffect effect) {
+    private InquisitorsFlailEffect(final InquisitorsFlailEffect effect) {
         super(effect);
     }
 
@@ -82,11 +82,6 @@ class InquisitorsFlailEffect extends ReplacementEffectImpl {
             }
         }
         return false;
-    }
-
-    @Override
-    public boolean apply(Game game, Ability source) {
-        return true;
     }
 
     @Override

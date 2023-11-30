@@ -57,18 +57,13 @@ class StonewiseFortifierPreventAllDamageToEffect extends PreventionEffectImpl {
         staticText = "Prevent all damage that would be dealt to {this} by target creature this turn";
     }
 
-    public StonewiseFortifierPreventAllDamageToEffect(final StonewiseFortifierPreventAllDamageToEffect effect) {
+    private StonewiseFortifierPreventAllDamageToEffect(final StonewiseFortifierPreventAllDamageToEffect effect) {
         super(effect);
     }
 
     @Override
     public StonewiseFortifierPreventAllDamageToEffect copy() {
         return new StonewiseFortifierPreventAllDamageToEffect(this);
-    }
-
-    @Override
-    public boolean apply(Game game, Ability source) {
-        return true;
     }
 
     @Override

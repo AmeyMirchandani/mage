@@ -65,7 +65,7 @@ class IncendiaryCommandDrawEffect extends OneShotEffect {
         this.staticText = "each player discards all the cards in their hand, then draws that many cards";
     }
 
-    public IncendiaryCommandDrawEffect(final IncendiaryCommandDrawEffect effect) {
+    private IncendiaryCommandDrawEffect(final IncendiaryCommandDrawEffect effect) {
         super(effect);
     }
 
@@ -83,8 +83,8 @@ class IncendiaryCommandDrawEffect extends OneShotEffect {
                 Player player = game.getPlayer(playerId);
                 if (player != null) {
                     int cardsInHand = player.getHand().size();
-                    player.discard(cardsInHand, false, false, source, game);
                     if (cardsInHand > 0) {
+                        player.discard(cardsInHand, false, false, source, game);
                         cardsToDraw.put(playerId, cardsInHand);
                     }
                 }

@@ -34,7 +34,7 @@ public final class BloodScrivener  extends CardImpl {
 
     }
 
-    public BloodScrivener (final BloodScrivener card) {
+    private BloodScrivener(final BloodScrivener card) {
         super(card);
     }
 
@@ -52,18 +52,13 @@ class BloodScrivenerReplacementEffect extends ReplacementEffectImpl {
         staticText = "If you would draw a card while you have no cards in hand, instead you draw two cards and you lose 1 life";
     }
 
-    public BloodScrivenerReplacementEffect(final BloodScrivenerReplacementEffect effect) {
+    private BloodScrivenerReplacementEffect(final BloodScrivenerReplacementEffect effect) {
         super(effect);
     }
 
     @Override
     public BloodScrivenerReplacementEffect copy() {
         return new BloodScrivenerReplacementEffect(this);
-    }
-
-    @Override
-    public boolean apply(Game game, Ability source) {
-        return true;
     }
 
     @Override

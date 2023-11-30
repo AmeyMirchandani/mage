@@ -51,18 +51,13 @@ class OpponentsCantSearchLibarariesEffect extends ContinuousRuleModifyingEffectI
         staticText = "Your opponents can't search libraries";
     }
 
-    public OpponentsCantSearchLibarariesEffect(final OpponentsCantSearchLibarariesEffect effect) {
+    private OpponentsCantSearchLibarariesEffect(final OpponentsCantSearchLibarariesEffect effect) {
         super(effect);
     }
 
     @Override
     public OpponentsCantSearchLibarariesEffect copy() {
         return new OpponentsCantSearchLibarariesEffect(this);
-    }
-
-    @Override
-    public boolean apply(Game game, Ability source) {
-        return true;
     }
 
     @Override
@@ -93,18 +88,13 @@ class StrangleholdSkipExtraTurnsEffect extends ReplacementEffectImpl {
         staticText = "If an opponent would begin an extra turn, that player skips that turn instead";
     }
 
-    public StrangleholdSkipExtraTurnsEffect(final StrangleholdSkipExtraTurnsEffect effect) {
+    private StrangleholdSkipExtraTurnsEffect(final StrangleholdSkipExtraTurnsEffect effect) {
         super(effect);
     }
 
     @Override
     public StrangleholdSkipExtraTurnsEffect copy() {
         return new StrangleholdSkipExtraTurnsEffect(this);
-    }
-
-    @Override
-    public boolean apply(Game game, Ability source) {
-        return true;
     }
 
     @Override

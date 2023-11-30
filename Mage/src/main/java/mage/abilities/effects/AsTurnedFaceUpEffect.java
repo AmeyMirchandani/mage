@@ -10,7 +10,6 @@ import mage.game.events.GameEvent;
 import mage.players.Player;
 
 /**
- *
  * @author LevelX2
  */
 public class AsTurnedFaceUpEffect extends ReplacementEffectImpl {
@@ -24,7 +23,7 @@ public class AsTurnedFaceUpEffect extends ReplacementEffectImpl {
         this.optional = optional;
     }
 
-    public AsTurnedFaceUpEffect(final AsTurnedFaceUpEffect effect) {
+    protected AsTurnedFaceUpEffect(final AsTurnedFaceUpEffect effect) {
         super(effect);
         this.baseEffects = effect.baseEffects.copy();
         this.optional = effect.optional;
@@ -42,11 +41,6 @@ public class AsTurnedFaceUpEffect extends ReplacementEffectImpl {
     @Override
     public boolean applies(GameEvent event, Ability source, Game game) {
         return event.getTargetId().equals(source.getSourceId());
-    }
-
-    @Override
-    public boolean apply(Game game, Ability source) {
-        return false;
     }
 
     @Override

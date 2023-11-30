@@ -52,7 +52,7 @@ class DictateOfTheTwinGodsEffect extends ReplacementEffectImpl {
         staticText = "If a source would deal damage to a permanent or player, that source deals double that damage to that permanent or player instead";
     }
 
-    public DictateOfTheTwinGodsEffect(final DictateOfTheTwinGodsEffect effect) {
+    private DictateOfTheTwinGodsEffect(final DictateOfTheTwinGodsEffect effect) {
         super(effect);
     }
 
@@ -74,11 +74,6 @@ class DictateOfTheTwinGodsEffect extends ReplacementEffectImpl {
 
     @Override
     public boolean applies(GameEvent event, Ability source, Game game) {
-        return true;
-    }
-
-    @Override
-    public boolean apply(Game game, Ability source) {
         return true;
     }
 

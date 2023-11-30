@@ -25,7 +25,7 @@ public final class UrabraskHereticPraetor extends CardImpl {
     public UrabraskHereticPraetor(UUID ownerId, CardSetInfo setInfo) {
         super(ownerId, setInfo, new CardType[]{CardType.CREATURE}, "{3}{R}{R}");
 
-        this.addSuperType(SuperType.LEGENDARY);
+        this.supertype.add(SuperType.LEGENDARY);
         this.subtype.add(SubType.PHYREXIAN);
         this.subtype.add(SubType.PRAETOR);
         this.power = new MageInt(4);
@@ -66,11 +66,6 @@ class UrabraskHereticPraetorEffect extends ReplacementEffectImpl {
 
     private UrabraskHereticPraetorEffect(final UrabraskHereticPraetorEffect effect) {
         super(effect);
-    }
-
-    @Override
-    public boolean apply(Game game, Ability source) {
-        return true;
     }
 
     @Override

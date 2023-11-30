@@ -54,7 +54,7 @@ class EnergyFieldEffect extends PreventionEffectImpl {
         staticText = "Prevent all damage that would be dealt to you by sources you don't control";
     }
 
-    public EnergyFieldEffect(EnergyFieldEffect effect) {
+    private EnergyFieldEffect(final EnergyFieldEffect effect) {
         super(effect);
     }
 
@@ -68,11 +68,6 @@ class EnergyFieldEffect extends PreventionEffectImpl {
             game.fireEvent(new PreventedDamageEvent(event.getTargetId(), source.getSourceId(), source, source.getControllerId(), damage));
         }
         return false;
-    }
-
-    @Override
-    public boolean apply(Game game, Ability source) {
-        return true;
     }
 
     @Override

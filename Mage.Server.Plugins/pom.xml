@@ -29,6 +29,7 @@
         <module>Mage.Game.FreeformCommanderDuel</module>
         <module>Mage.Game.FreeformCommanderFreeForAll</module>
         <module>Mage.Game.FreeformUnlimitedCommander</module>
+        <module>Mage.Game.CustomPillarOfTheParunsDuel</module>
         <module>Mage.Game.BrawlDuel</module>
         <module>Mage.Game.BrawlFreeForAll</module>
         <module>Mage.Game.OathbreakerDuel</module>
@@ -44,5 +45,9 @@
         <module>Mage.Tournament.Constructed</module>
         <module>Mage.Tournament.Sealed</module>
     </modules>
+
+    <properties>
+        <root.dir>${project.basedir}/..</root.dir>
+    </properties>
 
 </project>

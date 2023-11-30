@@ -47,18 +47,13 @@ class LichsMirrorEffect extends ReplacementEffectImpl {
         staticText = "If you would lose the game, instead shuffle your hand, your graveyard, and all permanents you own into your library, then draw seven cards and your life total becomes 20";
     }
 
-    public LichsMirrorEffect(final LichsMirrorEffect effect) {
+    private LichsMirrorEffect(final LichsMirrorEffect effect) {
         super(effect);
     }
 
     @Override
     public LichsMirrorEffect copy() {
         return new LichsMirrorEffect(this);
-    }
-
-    @Override
-    public boolean apply(Game game, Ability source) {
-        return true;
     }
 
     @Override

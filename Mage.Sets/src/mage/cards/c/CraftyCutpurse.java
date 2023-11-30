@@ -56,18 +56,13 @@ class CraftyCutpurseReplacementEffect extends ReplacementEffectImpl {
         staticText = "each token that would be created under an opponent's control this turn is created under your control instead";
     }
 
-    public CraftyCutpurseReplacementEffect(final CraftyCutpurseReplacementEffect effect) {
+    private CraftyCutpurseReplacementEffect(final CraftyCutpurseReplacementEffect effect) {
         super(effect);
     }
 
     @Override
     public CraftyCutpurseReplacementEffect copy() {
         return new CraftyCutpurseReplacementEffect(this);
-    }
-
-    @Override
-    public boolean apply(Game game, Ability source) {
-        return true;
     }
 
     @Override

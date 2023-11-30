@@ -54,7 +54,7 @@ class FireServantEffect extends ReplacementEffectImpl {
         staticText = "If a red instant or sorcery spell you control would deal damage, it deals double that damage instead";
     }
 
-    public FireServantEffect(final FireServantEffect effect) {
+    private FireServantEffect(final FireServantEffect effect) {
         super(effect);
     }
 
@@ -76,11 +76,6 @@ class FireServantEffect extends ReplacementEffectImpl {
                 spell.isControlledBy(source.getControllerId()) &&
                 spell.getColor(game).isRed() &&
                 spell.isInstantOrSorcery(game);
-    }
-
-    @Override
-    public boolean apply(Game game, Ability source) {
-        return true;
     }
 
     @Override

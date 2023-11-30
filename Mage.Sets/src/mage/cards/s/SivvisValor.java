@@ -69,7 +69,7 @@ class SivvisValorEffect extends ReplacementEffectImpl {
         staticText = "All damage that would be dealt to target creature this turn is dealt to you instead";
     }
 
-    public SivvisValorEffect(final SivvisValorEffect effect) {
+    private SivvisValorEffect(final SivvisValorEffect effect) {
         super(effect);
     }
 
@@ -81,11 +81,6 @@ class SivvisValorEffect extends ReplacementEffectImpl {
     @Override
     public boolean checksEventType(GameEvent event, Game game) {
         return event.getType() == GameEvent.EventType.DAMAGE_PERMANENT;
-    }
-
-    @Override
-    public boolean apply(Game game, Ability source) {
-        return true;
     }
 
     @Override

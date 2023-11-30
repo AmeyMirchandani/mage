@@ -45,7 +45,7 @@ class BloodOfTheMartyrEffect extends ReplacementEffectImpl {
         staticText = "Until end of turn, if damage would be dealt to any creature, you may have that damage dealt to you instead";
     }
 
-    public BloodOfTheMartyrEffect(final BloodOfTheMartyrEffect effect) {
+    private BloodOfTheMartyrEffect(final BloodOfTheMartyrEffect effect) {
         super(effect);
     }
 
@@ -57,11 +57,6 @@ class BloodOfTheMartyrEffect extends ReplacementEffectImpl {
     @Override
     public boolean checksEventType(GameEvent event, Game game) {
         return event.getType() == GameEvent.EventType.DAMAGE_PERMANENT;
-    }
-
-    @Override
-    public boolean apply(Game game, Ability source) {
-        return true;
     }
 
     @Override

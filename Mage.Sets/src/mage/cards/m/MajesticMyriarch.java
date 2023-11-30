@@ -35,7 +35,7 @@ public final class MajesticMyriarch extends CardImpl {
 
         // Majestic Myriarch's power and toughness are each equal to twice the number of creatures you control.
         DynamicValue xValue = new MultipliedValue(new PermanentsOnBattlefieldCount(new FilterControlledCreaturePermanent()), 2);
-        Effect effect = new SetBasePowerToughnessSourceEffect(xValue, Duration.EndOfGame);
+        Effect effect = new SetBasePowerToughnessSourceEffect(xValue);
         effect.setText("{this}'s power and toughness are each equal to twice the number of creatures you control");
         this.addAbility(new SimpleStaticAbility(Zone.ALL, effect));
 
@@ -90,7 +90,7 @@ class MajesticMyriarchEffect extends OneShotEffect {
                 "The same is true for first strike, double strike, deathtouch, haste, hexproof, indestructible, lifelink, menace, reach, trample, and vigilance.";
     }
 
-    MajesticMyriarchEffect(final MajesticMyriarchEffect effect) {
+    private MajesticMyriarchEffect(final MajesticMyriarchEffect effect) {
         super(effect);
     }
 

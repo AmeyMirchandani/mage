@@ -89,7 +89,7 @@ class NettlingImpDelayedDestroyEffect extends OneShotEffect {
         this.staticText = "If it doesn't, destroy it at the beginning of the next end step";
     }
 
-    public NettlingImpDelayedDestroyEffect(final NettlingImpDelayedDestroyEffect effect) {
+    private NettlingImpDelayedDestroyEffect(final NettlingImpDelayedDestroyEffect effect) {
         super(effect);
     }
 
@@ -104,7 +104,6 @@ class NettlingImpDelayedDestroyEffect extends OneShotEffect {
         effect.setTargetPointer(new FixedTarget(source.getFirstTarget(), game));
         AtTheBeginOfNextEndStepDelayedTriggeredAbility delayedAbility
                 = new AtTheBeginOfNextEndStepDelayedTriggeredAbility(effect, TargetController.ANY, new InvertCondition(TargetAttackedThisTurnCondition.instance));
-        delayedAbility.getDuration();
         delayedAbility.getTargets().addAll(source.getTargets());
         game.addDelayedTriggeredAbility(delayedAbility, source);
         return true;

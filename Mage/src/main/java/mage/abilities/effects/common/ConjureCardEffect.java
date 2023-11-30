@@ -56,7 +56,7 @@ public class ConjureCardEffect extends OneShotEffect {
         }
         CardInfo cardInfo = CardRepository
                 .instance
-                .findCards(new CardCriteria().nameExact(cardName))
+                .findCards(new CardCriteria().name(cardName))
                 .stream()
                 .findFirst()
                 .orElse(null);
@@ -74,6 +74,9 @@ public class ConjureCardEffect extends OneShotEffect {
 
     @Override
     public String getText(Mode mode) {
+        if (staticText != null && !staticText.isEmpty()) {
+            return staticText;
+        }
         StringBuilder sb = new StringBuilder("conjure ");
         sb.append(CardUtil.numberToText(amount, "a"));
         sb.append(' ');

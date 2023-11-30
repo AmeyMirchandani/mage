@@ -1,6 +1,7 @@
 package mage.cards.f;
 
 import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 import mage.MageObject;
@@ -52,9 +53,9 @@ public final class FatalGrudge extends CardImpl {
 
 class FatalGrudgeEffect extends OneShotEffect {
 
-    public FatalGrudgeEffect() {
+    FatalGrudgeEffect() {
         super(Outcome.Sacrifice);
-        this.staticText = "each opponent chooses a permanent they control that shares a type with the sacrificed permanent and sacrifices it";
+        this.staticText = "each opponent chooses a permanent they control that shares a card type with the sacrificed permanent and sacrifices it";
     }
 
     private FatalGrudgeEffect(final FatalGrudgeEffect effect) {
@@ -95,9 +96,9 @@ class FatalGrudgeEffect extends OneShotEffect {
 
 class FatalGrudgePredicate implements Predicate<MageObject> {
 
-    private final HashSet<CardType> types;
+    private final Set<CardType> types;
 
-    public FatalGrudgePredicate(HashSet<CardType> types) {
+    public FatalGrudgePredicate(Set<CardType> types) {
         this.types = types;
     }
 

@@ -100,6 +100,10 @@ public class MageObjectReference implements Comparable<MageObjectReference>, Ser
         }
     }
 
+    @Override
+    public String toString(){
+        return "("+zoneChangeCounter+"|"+sourceId.toString().substring(0,3)+")";
+    }
     public UUID getSourceId() {
         return sourceId;
     }
@@ -111,7 +115,7 @@ public class MageObjectReference implements Comparable<MageObjectReference>, Ser
     @Override
     public int compareTo(MageObjectReference o) {
         if (o.getSourceId() == null || this.sourceId == null || Objects.equals(o.getSourceId(), this.sourceId)) {
-            return o.getZoneChangeCounter() - this.zoneChangeCounter;
+            return Integer.compare(o.getZoneChangeCounter(), this.zoneChangeCounter);
         }
         return o.getSourceId().compareTo(sourceId);
     }

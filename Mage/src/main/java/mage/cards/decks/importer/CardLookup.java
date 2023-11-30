@@ -1,11 +1,11 @@
 package mage.cards.decks.importer;
 
-import java.util.List;
-import java.util.Optional;
-
 import mage.cards.repository.CardCriteria;
 import mage.cards.repository.CardInfo;
 import mage.cards.repository.CardRepository;
+
+import java.util.List;
+import java.util.Optional;
 
 public class CardLookup {
 
@@ -20,6 +20,10 @@ public class CardLookup {
     }
 
     public Optional<CardInfo> lookupCardInfo(String name, String set) {
+        if (set == null) {
+            return lookupCardInfo(name);
+        }
+
         Optional<CardInfo> result = lookupCardInfo(new CardCriteria().name(name).setCodes(set))
                 .stream()
                 .findAny();

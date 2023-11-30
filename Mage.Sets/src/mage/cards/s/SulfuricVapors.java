@@ -48,7 +48,7 @@ class SulfuricVaporsEffect extends ReplacementEffectImpl {
         staticText = "If a red spell would deal damage to a permanent or player, it deals that much damage plus 1 to that permanent or player instead";
     }
 
-    public SulfuricVaporsEffect(final SulfuricVaporsEffect effect) {
+    private SulfuricVaporsEffect(final SulfuricVaporsEffect effect) {
         super(effect);
     }
 
@@ -67,11 +67,6 @@ class SulfuricVaporsEffect extends ReplacementEffectImpl {
     public boolean applies(GameEvent event, Ability source, Game game) {
         StackObject spell = game.getStack().getStackObject(event.getSourceId());
         return spell != null && spell.getColor(game).isRed();
-    }
-
-    @Override
-    public boolean apply(Game game, Ability source) {
-        return true;
     }
 
     @Override

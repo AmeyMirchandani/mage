@@ -65,7 +65,7 @@ class JinxedChokerChangeControllerEffect extends ContinuousEffectImpl {
         staticText = "target opponent gains control of {this}";
     }
 
-    public JinxedChokerChangeControllerEffect(final JinxedChokerChangeControllerEffect effect) {
+    private JinxedChokerChangeControllerEffect(final JinxedChokerChangeControllerEffect effect) {
         super(effect);
     }
 
@@ -76,7 +76,7 @@ class JinxedChokerChangeControllerEffect extends ContinuousEffectImpl {
 
     @Override
     public boolean apply(Game game, Ability source) {
-        Permanent permanent = (Permanent) source.getSourceObjectIfItStillExists(game);
+        Permanent permanent = source.getSourcePermanentIfItStillExists(game);
         if (permanent != null) {
             return permanent.changeControllerId(source.getFirstTarget(), game, source);
         } else {
@@ -149,7 +149,7 @@ class JinxedChokerCounterEffect extends OneShotEffect {
         this.staticText = "Put a charge counter on {this} or remove one from it";
     }
 
-    public JinxedChokerCounterEffect(final JinxedChokerCounterEffect effect) {
+    private JinxedChokerCounterEffect(final JinxedChokerCounterEffect effect) {
         super(effect);
     }
 

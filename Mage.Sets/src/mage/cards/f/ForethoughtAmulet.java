@@ -52,7 +52,7 @@ class ForethoughtAmuletEffect extends ReplacementEffectImpl {
         staticText = "If an instant or sorcery source would deal 3 or more damage to you, it deals 2 damage to you instead";
     }
 
-    public ForethoughtAmuletEffect(final ForethoughtAmuletEffect effect) {
+    private ForethoughtAmuletEffect(final ForethoughtAmuletEffect effect) {
         super(effect);
     }
 
@@ -64,11 +64,6 @@ class ForethoughtAmuletEffect extends ReplacementEffectImpl {
     @Override
     public boolean checksEventType(GameEvent event, Game game) {
         return event.getType() == GameEvent.EventType.DAMAGE_PLAYER;
-    }
-
-    @Override
-    public boolean apply(Game game, Ability source) {
-        return true;
     }
 
     @Override

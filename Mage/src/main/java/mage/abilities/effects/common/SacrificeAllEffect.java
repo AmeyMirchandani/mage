@@ -1,4 +1,3 @@
-
 package mage.abilities.effects.common;
 
 import mage.abilities.Ability;
@@ -40,7 +39,7 @@ public class SacrificeAllEffect extends OneShotEffect {
         setText();
     }
 
-    public SacrificeAllEffect(final SacrificeAllEffect effect) {
+    protected SacrificeAllEffect(final SacrificeAllEffect effect) {
         super(effect);
         this.amount = effect.amount;
         this.filter = effect.filter.copy();
@@ -87,11 +86,14 @@ public class SacrificeAllEffect extends OneShotEffect {
         if (amount.toString().equals("X")) {
             sb.append(amount.toString());
             sb.append(' ');
-        } else if (!filter.getMessage().startsWith("a ")) {
+            sb.append(filter.getMessage());
+        } else if (amount.toString().equals("1")) {
+            sb.append(CardUtil.addArticle(filter.getMessage()));
+        } else {
             sb.append(CardUtil.numberToText(amount.toString(), "a"));
             sb.append(' ');
+            sb.append(filter.getMessage());
         }
-        sb.append(filter.getMessage());
         staticText = sb.toString();
     }
 

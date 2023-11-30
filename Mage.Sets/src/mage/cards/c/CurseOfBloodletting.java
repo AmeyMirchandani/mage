@@ -54,7 +54,7 @@ class CurseOfBloodlettingEffect extends ReplacementEffectImpl {
         staticText = "If a source would deal damage to enchanted player, it deals double that damage to that player instead";
     }
 
-    public CurseOfBloodlettingEffect(final CurseOfBloodlettingEffect effect) {
+    private CurseOfBloodlettingEffect(final CurseOfBloodlettingEffect effect) {
         super(effect);
     }
 
@@ -76,11 +76,6 @@ class CurseOfBloodlettingEffect extends ReplacementEffectImpl {
             return true;
         }
         return false;
-    }
-
-    @Override
-    public boolean apply(Game game, Ability source) {
-        return true;
     }
 
     @Override

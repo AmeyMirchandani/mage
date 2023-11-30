@@ -69,12 +69,12 @@ class PhantasmalSphereEffect extends OneShotEffect {
 
     public PhantasmalSphereEffect() {
         super(Outcome.PutCreatureInPlay);
-        this.staticText = "target opponent puts an X/X blue Orb creature token "
-                + "with flying onto the battlefield, where X is the number "
+        this.staticText = "target opponent creates an X/X blue Orb creature token "
+                + "with flying, where X is the number "
                 + "of +1/+1 counters on {this}";
     }
 
-    public PhantasmalSphereEffect(final PhantasmalSphereEffect effect) {
+    private PhantasmalSphereEffect(final PhantasmalSphereEffect effect) {
         super(effect);
     }
 
@@ -111,7 +111,7 @@ class PhantasmalSphereToken extends TokenImpl {
         addAbility(FlyingAbility.getInstance());
     }
 
-    public PhantasmalSphereToken(final PhantasmalSphereToken token) {
+    private PhantasmalSphereToken(final PhantasmalSphereToken token) {
         super(token);
     }
 

@@ -1,4 +1,3 @@
-
 package mage.cards.l;
 
 import java.util.List;
@@ -29,7 +28,7 @@ public final class LandsEdge extends CardImpl {
 
     public LandsEdge(UUID ownerId, CardSetInfo setInfo) {
         super(ownerId, setInfo, new CardType[]{CardType.ENCHANTMENT}, "{1}{R}{R}");
-        addSuperType(SuperType.WORLD);
+        this.supertype.add(SuperType.WORLD);
 
         // Discard a card: If the discarded card was a land card, Land's Edge deals 2 damage to target player. Any player may activate this ability.
         SimpleActivatedAbility ability = new SimpleActivatedAbility(Zone.BATTLEFIELD, new LandsEdgeEffect(), new DiscardCardCost(false));
@@ -54,10 +53,10 @@ class LandsEdgeEffect extends OneShotEffect {
 
     public LandsEdgeEffect() {
         super(Outcome.Neutral);
-        staticText = "If the discarded card was a land card, {this} deals 2 damage to target player";
+        staticText = "If the discarded card was a land card, {this} deals 2 damage to target player or planeswalker";
     }
 
-    public LandsEdgeEffect(final LandsEdgeEffect effect) {
+    private LandsEdgeEffect(final LandsEdgeEffect effect) {
         super(effect);
     }
 

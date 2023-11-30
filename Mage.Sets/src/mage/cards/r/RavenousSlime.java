@@ -56,18 +56,13 @@ class RavenousSlimeEffect extends ReplacementEffectImpl {
                 + "equal to that creature's power on {this}";
     }
 
-    public RavenousSlimeEffect(final RavenousSlimeEffect effect) {
+    private RavenousSlimeEffect(final RavenousSlimeEffect effect) {
         super(effect);
     }
 
     @Override
     public RavenousSlimeEffect copy() {
         return new RavenousSlimeEffect(this);
-    }
-
-    @Override
-    public boolean apply(Game game, Ability source) {
-        return true;
     }
 
     @Override

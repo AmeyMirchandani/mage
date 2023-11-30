@@ -37,12 +37,13 @@ import mage.client.util.stats.UpdateMemUsageTask;
 import mage.components.ImagePanel;
 import mage.components.ImagePanelStyle;
 import mage.constants.PlayerAction;
-import mage.game.draft.RateCard;
+import mage.cards.RateCard;
 import mage.interfaces.MageClient;
 import mage.interfaces.callback.CallbackClient;
 import mage.interfaces.callback.ClientCallback;
 import mage.remote.Connection;
 import mage.remote.Connection.ProxyType;
+import mage.util.DebugUtil;
 import mage.utils.MageVersion;
 import mage.view.GameEndView;
 import mage.view.UserRequestMessage;
@@ -73,7 +74,6 @@ import java.io.InputStream;
 import java.net.SocketException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.*;
 import java.util.concurrent.Executors;
@@ -98,7 +98,7 @@ public class MageFrame extends javax.swing.JFrame implements MageClient {
     private static final String PASSWORD_ARG = "-pw";
     private static final String SERVER_ARG = "-server";
     private static final String PORT_ARG = "-port";
-    private static final String DEBUG_ARG = "-debug";
+    private static final String DEBUG_ARG = "-debug"; // enable debug button in main menu
 
     private static final String NOT_CONNECTED_TEXT = "<not connected>";
     private static final String NOT_CONNECTED_BUTTON = "CONNECT TO SERVER";
@@ -249,6 +249,11 @@ public class MageFrame extends javax.swing.JFrame implements MageClient {
             // UIManager.put("Table.rowHeight", GUISizeHelper.tableRowHeight);
         } catch (Exception ex) {
             LOGGER.fatal(null, ex);
+        }
+
+        // other settings
+        if (ClientCallback.SIMULATE_BAD_CONNECTION) {
+            LOGGER.info("Network: bad connection mode enabled");
         }
 
         // DATA PREPARE
@@ -413,6 +418,9 @@ public class MageFrame extends javax.swing.JFrame implements MageClient {
         popupContainer.setLayout(null);
         popupContainer.add(cardInfoPane);
         popupContainer.setVisible(false);
+        if (DebugUtil.GUI_POPUP_CONTAINER_DRAW_DEBUG_BORDER) {
+            popupContainer.setBorder(BorderFactory.createLineBorder(Color.red));
+        }
         desktopPane.add(popupContainer, JLayeredPane.POPUP_LAYER);
         UI.addComponent(MageComponents.POPUP_CONTAINER, popupContainer);
 
@@ -810,9 +818,6 @@ public class MageFrame extends javax.swing.JFrame implements MageClient {
             currentConnection.setPassword(password);
             currentConnection.setHost(server);
             currentConnection.setPort(port);
-            // force to redownload db on updates
-            boolean redownloadDatabase = (ExpansionRepository.instance.getSetByCode("GRN") == null || CardRepository.instance.findCard("Island") == null);
-            currentConnection.setForceDBComparison(redownloadDatabase);
             String allMAC = "";
             try {
                 allMAC = Connection.getMAC();
@@ -1018,8 +1023,11 @@ public class MageFrame extends javax.swing.JFrame implements MageClient {
         btnDebug.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         btnDebug.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                btnDebugMouseClicked(evt);
+            public void mouseClicked(java.awt.event.MouseEvent e) {
+                if (!SwingUtilities.isLeftMouseButton(e)) {
+                    return;
+                }
+                btnDebugMouseClicked(e);
             }
         });
         mageToolbar.add(btnDebug);
@@ -1198,6 +1206,7 @@ public class MageFrame extends javax.swing.JFrame implements MageClient {
                 DeckEditorPane deckEditorPane = (DeckEditorPane) window;
                 if (deckEditorPane.getDeckEditorMode() == DeckEditorMode.LIMITED_BUILDING
                         || deckEditorPane.getDeckEditorMode() == DeckEditorMode.SIDEBOARDING
+                        || deckEditorPane.getDeckEditorMode() == DeckEditorMode.LIMITED_SIDEBOARD_BUILDING
                         || deckEditorPane.getDeckEditorMode() == DeckEditorMode.VIEW_LIMITED_DECK) {
                     deckEditorPane.removeFrame();
                 }
@@ -1208,7 +1217,10 @@ public class MageFrame extends javax.swing.JFrame implements MageClient {
 
     public void showDeckEditor(DeckEditorMode mode, Deck deck, UUID tableId, int time) {
         String name;
-        if (mode == DeckEditorMode.SIDEBOARDING || mode == DeckEditorMode.LIMITED_BUILDING || mode == DeckEditorMode.VIEW_LIMITED_DECK) {
+        if (mode == DeckEditorMode.SIDEBOARDING
+                || mode == DeckEditorMode.LIMITED_BUILDING
+                || mode == DeckEditorMode.LIMITED_SIDEBOARD_BUILDING
+                || mode == DeckEditorMode.VIEW_LIMITED_DECK) {
             name = "Deck Editor - " + tableId.toString();
         } else {
             if (deck != null) {
@@ -1327,6 +1339,10 @@ public class MageFrame extends javax.swing.JFrame implements MageClient {
                     debugMode = true;
                 }
             }
+
+            // enable debug menu by default for developer build (if you run it from source code)
+            debugMode |= VERSION.isDeveloperBuild();
+
             if (!liteMode) {
                 final SplashScreen splash = SplashScreen.getSplashScreen();
                 if (splash != null) {

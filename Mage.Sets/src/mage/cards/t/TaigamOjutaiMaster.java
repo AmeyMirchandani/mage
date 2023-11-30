@@ -30,7 +30,7 @@ import mage.watchers.common.AttackedThisTurnWatcher;
 public final class TaigamOjutaiMaster extends CardImpl {
 
     private static final String effectText = "Whenever you cast an instant or sorcery spell from your hand, if {this} attacked this turn, that spell gains rebound.";
-    private static final FilterSpell filter = new FilterSpell("Instant, Sorcery, and Dragon spells you control");
+    private static final FilterSpell filter = new FilterSpell("Instant, sorcery, and Dragon spells you control");
 
     static {
         filter.add(
@@ -44,7 +44,7 @@ public final class TaigamOjutaiMaster extends CardImpl {
     public TaigamOjutaiMaster(UUID ownerId, CardSetInfo setInfo) {
         super(ownerId, setInfo, new CardType[]{CardType.CREATURE}, "{2}{W}{U}");
 
-        addSuperType(SuperType.LEGENDARY);
+        this.supertype.add(SuperType.LEGENDARY);
         this.subtype.add(SubType.HUMAN);
         this.subtype.add(SubType.MONK);
         this.power = new MageInt(3);
@@ -116,7 +116,7 @@ class TaigamOjutaiMasterGainReboundEffect extends ContinuousEffectImpl {
         staticText = "that spell gains rebound";
     }
 
-    public TaigamOjutaiMasterGainReboundEffect(final TaigamOjutaiMasterGainReboundEffect effect) {
+    private TaigamOjutaiMasterGainReboundEffect(final TaigamOjutaiMasterGainReboundEffect effect) {
         super(effect);
     }
 

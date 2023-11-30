@@ -62,18 +62,13 @@ class FastingReplacementEffect extends ReplacementEffectImpl {
         staticText = "If you would begin your draw step, you may skip that step instead. If you do, you gain 2 life";
     }
 
-    public FastingReplacementEffect(final FastingReplacementEffect effect) {
+    private FastingReplacementEffect(final FastingReplacementEffect effect) {
         super(effect);
     }
 
     @Override
     public FastingReplacementEffect copy() {
         return new FastingReplacementEffect(this);
-    }
-
-    @Override
-    public boolean apply(Game game, Ability source) {
-        return true;
     }
 
     @Override

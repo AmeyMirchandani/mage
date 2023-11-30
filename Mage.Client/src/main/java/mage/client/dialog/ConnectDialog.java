@@ -67,7 +67,6 @@ public class ConnectDialog extends MageDialog {
         this.txtUserName.setText(MagePreferences.getUserName(serverAddress));
         this.txtPassword.setText(MagePreferences.getPassword(serverAddress));
         this.chkAutoConnect.setSelected(Boolean.parseBoolean(MageFrame.getPreferences().get(KEY_CONNECT_AUTO_CONNECT, "false")));
-        this.chkForceUpdateDB.setSelected(false); // has always to be set manually to force comparison
 
         String selectedFlag = MageFrame.getPreferences().get(KEY_CONNECT_FLAG, "world");
         // set the selected country/flag
@@ -223,7 +222,6 @@ public class ConnectDialog extends MageDialog {
         txtPassword = new javax.swing.JPasswordField();
         lblFlag = new javax.swing.JLabel();
         chkAutoConnect = new javax.swing.JCheckBox();
-        chkForceUpdateDB = new javax.swing.JCheckBox();
         jProxySettingsButton = new javax.swing.JButton();
         btnConnect = new javax.swing.JButton();
         btnCancel = new javax.swing.JButton();
@@ -274,14 +272,6 @@ public class ConnectDialog extends MageDialog {
         chkAutoConnect.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 chkAutoConnectActionPerformed(evt);
-            }
-        });
-
-        chkForceUpdateDB.setText("Force update of card database");
-        chkForceUpdateDB.setToolTipText("<HTML>If active the comparison of the server cards database to the client database will be enforced.<br>If not, the comparison will only done if the database version of the client is lower than the version of the server.");
-        chkForceUpdateDB.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                chkForceUpdateDBActionPerformed(evt);
             }
         });
 
@@ -359,6 +349,7 @@ public class ConnectDialog extends MageDialog {
         btnFindMain.setText("X");
         btnFindMain.setToolTipText("Connect to xmage.de (first Europe server, most popular, registration needs)");
         btnFindMain.setAlignmentY(0.0F);
+        btnFindMain.setEnabled(false);
         btnFindMain.setMargin(new java.awt.Insets(2, 2, 2, 2));
         btnFindMain.setMaximumSize(new java.awt.Dimension(42, 23));
         btnFindMain.setMinimumSize(new java.awt.Dimension(42, 23));
@@ -381,8 +372,8 @@ public class ConnectDialog extends MageDialog {
             }
         });
 
-        btnFindBeta.setText("BETA, AI");
-        btnFindBeta.setToolTipText("Connect to BETA server, AI enabled (use any username without registration)");
+        btnFindBeta.setText("BETA");
+        btnFindBeta.setToolTipText("Connect to BETA server, AI disabled (use any username without registration)");
         btnFindBeta.setAlignmentY(0.0F);
         btnFindBeta.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         btnFindBeta.setMargin(new java.awt.Insets(2, 2, 2, 2));
@@ -397,6 +388,7 @@ public class ConnectDialog extends MageDialog {
         btnFindUs.setText("US");
         btnFindUs.setToolTipText("Connect to us.xmage.today (USA, use any username without registration)");
         btnFindUs.setAlignmentY(0.0F);
+        btnFindUs.setEnabled(false);
         btnFindUs.setMargin(new java.awt.Insets(2, 2, 2, 2));
         btnFindUs.setPreferredSize(new java.awt.Dimension(23, 23));
         btnFindUs.addActionListener(new java.awt.event.ActionListener() {
@@ -407,6 +399,7 @@ public class ConnectDialog extends MageDialog {
 
         btnFindOther.setText("Other...");
         btnFindOther.setToolTipText("Choose server from full servers list");
+        btnFindOther.setEnabled(false);
         btnFindOther.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         btnFindOther.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -418,6 +411,7 @@ public class ConnectDialog extends MageDialog {
         btnFindEU.setText("EU");
         btnFindEU.setToolTipText("Connect to eu.xmage.today (second Europe server, use any username without registration)");
         btnFindEU.setAlignmentY(0.0F);
+        btnFindEU.setEnabled(false);
         btnFindEU.setMargin(new java.awt.Insets(2, 2, 2, 2));
         btnFindEU.setMaximumSize(new java.awt.Dimension(42, 23));
         btnFindEU.setMinimumSize(new java.awt.Dimension(42, 23));
@@ -474,6 +468,7 @@ public class ConnectDialog extends MageDialog {
         btnCheckStatus.setText("Check online status");
         btnCheckStatus.setToolTipText("Go to servers online statuses page");
         btnCheckStatus.setAlignmentY(0.0F);
+        btnCheckStatus.setEnabled(false);
         btnCheckStatus.setMargin(new java.awt.Insets(2, 2, 2, 2));
         btnCheckStatus.setPreferredSize(new java.awt.Dimension(23, 23));
         btnCheckStatus.addActionListener(new java.awt.event.ActionListener() {
@@ -531,7 +526,6 @@ public class ConnectDialog extends MageDialog {
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(lblStatus, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(chkForceUpdateDB, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(chkAutoConnect, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(txtUserName)
                     .addComponent(panelFlag, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -581,20 +575,18 @@ public class ConnectDialog extends MageDialog {
                                 .addComponent(txtPassword)
                                 .addComponent(jLabel1))
                             .addComponent(lblPassword, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-                    .addComponent(filler2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(filler2, javax.swing.GroupLayout.DEFAULT_SIZE, 52, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(panelFlag, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(lblFlag, javax.swing.GroupLayout.PREFERRED_SIZE, 18, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(chkAutoConnect)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(chkForceUpdateDB)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jProxySettingsButton, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnWhatsNew, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGap(29, 29, 29)
                 .addComponent(lblStatus, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
@@ -650,11 +642,10 @@ public class ConnectDialog extends MageDialog {
             connection.setPort(Integer.parseInt(this.txtPort.getText().trim()));
             connection.setUsername(this.txtUserName.getText().trim());
             connection.setPassword(String.valueOf(this.txtPassword.getPassword()).trim());
-            connection.setForceDBComparison(this.chkForceUpdateDB.isSelected() || RepositoryUtil.isDatabaseEmpty());
             String allMAC = "";
             try {
                 allMAC = Connection.getMAC();
-            } catch (SocketException ex) {
+            } catch (SocketException ignore) {
             }
             connection.setUserIdStr(System.getProperty("user.name") + ":" + System.getProperty("os.name") + ":" + MagePreferences.getUserNames() + ":" + allMAC);
             MageFrame.getPreferences().put(KEY_CONNECT_FLAG, ((CountryItemEditor) cbFlag.getEditor()).getImageItem());
@@ -744,10 +735,6 @@ public class ConnectDialog extends MageDialog {
     private void jProxySettingsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jProxySettingsButtonActionPerformed
         PreferencesDialog.main(new String[]{PreferencesDialog.OPEN_CONNECTION_TAB});
     }//GEN-LAST:event_jProxySettingsButtonActionPerformed
-
-    private void chkForceUpdateDBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkForceUpdateDBActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_chkForceUpdateDBActionPerformed
 
     private void txtUserNameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtUserNameActionPerformed
         // TODO add your handling code here:
@@ -903,7 +890,6 @@ public class ConnectDialog extends MageDialog {
     private javax.swing.JButton btnWhatsNew;
     private mage.client.util.gui.countryBox.CountryComboBox cbFlag;
     private javax.swing.JCheckBox chkAutoConnect;
-    private javax.swing.JCheckBox chkForceUpdateDB;
     private javax.swing.Box.Filler filler1;
     private javax.swing.Box.Filler filler2;
     private javax.swing.JLabel jLabel1;

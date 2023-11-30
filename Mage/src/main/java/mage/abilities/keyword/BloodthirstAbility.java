@@ -1,8 +1,5 @@
 package mage.abilities.keyword;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
 import mage.abilities.Ability;
 import mage.abilities.common.EntersBattlefieldAbility;
 import mage.abilities.effects.OneShotEffect;
@@ -14,26 +11,29 @@ import mage.players.Player;
 import mage.util.CardUtil;
 import mage.watchers.common.BloodthirstWatcher;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+
 /**
- *
  * @author Loki
  */
 public class BloodthirstAbility extends EntersBattlefieldAbility {
 
-    private int amount;
+    private final int amount;
 
     public BloodthirstAbility(int amount) {
         super(new BloodthirstEffect(amount), "");
         this.amount = amount;
     }
 
-    public BloodthirstAbility(final BloodthirstAbility ability) {
+    protected BloodthirstAbility(final BloodthirstAbility ability) {
         super(ability);
         this.amount = ability.amount;
     }
 
     @Override
-    public EntersBattlefieldAbility copy() {
+    public BloodthirstAbility copy() {
         return new BloodthirstAbility(this);
     }
 
@@ -44,7 +44,7 @@ public class BloodthirstAbility extends EntersBattlefieldAbility {
         if (amount == 1) {
             sb.append("a +1/+1 counter");
         } else {
-            sb.append(CardUtil.numberToText(amount)).append(" counters");
+            sb.append(CardUtil.numberToText(amount)).append(" +1/+1 counters");
         }
         sb.append(" on it.)</i>");
         return sb.toString();

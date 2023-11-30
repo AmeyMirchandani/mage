@@ -2,6 +2,7 @@
 package mage.cards.u;
 
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.UUID;
 import mage.MageInt;
@@ -52,7 +53,7 @@ public final class UrzasAvenger extends CardImpl {
 
 class UrzasAvengerEffect extends ContinuousEffectImpl {
 
-    private static final Set<String> choices = new HashSet<>();
+    private static final Set<String> choices = new LinkedHashSet<>();
     private Ability gainedAbility;
 
     static {
@@ -67,7 +68,7 @@ class UrzasAvengerEffect extends ContinuousEffectImpl {
         this.staticText = "{this} gets -1/-1 and gains your choice of banding, flying, first strike, or trample until end of turn";
     }
 
-    public UrzasAvengerEffect(final UrzasAvengerEffect effect) {
+    private UrzasAvengerEffect(final UrzasAvengerEffect effect) {
         super(effect);
     }
 

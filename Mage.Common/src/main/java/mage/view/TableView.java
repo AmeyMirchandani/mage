@@ -7,7 +7,9 @@ import mage.game.Seat;
 import mage.game.Table;
 import mage.game.draft.Draft;
 import mage.game.draft.DraftOptions;
+import mage.game.match.MatchOptions;
 import mage.game.match.MatchPlayer;
+import mage.game.mulligan.MulliganType;
 import mage.game.tournament.TournamentPlayer;
 
 import java.io.Serializable;
@@ -28,7 +30,8 @@ public class TableView implements Serializable {
     private final String deckType;
     private String tableName;
     private String controllerName;
-    private final String additionalInfo;
+    private final String additionalInfoShort;
+    private final String additionalInfoFull;
     private Date createTime;
     private TableState tableState;
     private final SkillLevel skillLevel;
@@ -98,8 +101,18 @@ public class TableView implements Serializable {
             if (table.getMatch().getGames().isEmpty()) {
                 addInfo.append("Wins:").append(table.getMatch().getWinsNeeded());
                 addInfo.append(" Time: ").append(table.getMatch().getOptions().getMatchTimeLimit().toString());
+                addInfo.append(" Buffer: ").append(table.getMatch().getOptions().getMatchBufferTime().toString());
+                if (table.getMatch().getOptions().getMulliganType() != MulliganType.GAME_DEFAULT) {
+                    addInfo.append(" Mulligan: \"").append(table.getMatch().getOptions().getMulliganType().toString()).append("\"");
+                }
                 if (table.getMatch().getFreeMulligans() > 0) {
                     addInfo.append(" FM: ").append(table.getMatch().getFreeMulligans());
+                }
+                if (table.getMatch().getOptions().isCustomStartLifeEnabled()) {
+                    addInfo.append(" StartLife: ").append(table.getMatch().getOptions().getCustomStartLife());
+                }
+                if (table.getMatch().getOptions().isCustomStartHandSizeEnabled()) {
+                    addInfo.append(" StartHandSize: ").append(table.getMatch().getOptions().getCustomStartHandSize());
                 }
             } else {
                 addInfo.append("Wins:").append(table.getMatch().getWinsNeeded());
@@ -111,13 +124,18 @@ public class TableView implements Serializable {
             if (table.getMatch().getOptions().isPlaneChase()) {
                 addInfo.append(" PC");
             }
+            if (!(table.getMatch().getOptions().getPerPlayerEmblemCards().isEmpty())
+                    || !(table.getMatch().getOptions().getGlobalEmblemCards().isEmpty())) {
+                addInfo.append(" EC");
+            }
             if (table.getMatch().getOptions().isSpectatorsAllowed()) {
                 addInfo.append(" SP");
             }
             if (table.getNumberOfSeats() > 3) {
                 addInfo.append(" Rng: ").append(table.getMatch().getOptions().getRange().toString());
             }
-            this.additionalInfo = addInfo.toString();
+            this.additionalInfoShort = addInfo.toString();
+            this.additionalInfoFull = addInfo.toString(); // TODO: add tooltip details here
             this.skillLevel = table.getMatch().getOptions().getSkillLevel();
             this.quitRatio = Integer.toString(table.getMatch().getOptions().getQuitRatio());
             this.minimumRating = Integer.toString(table.getMatch().getOptions().getMinimumRating());
@@ -149,9 +167,20 @@ public class TableView implements Serializable {
                     if (TableState.WAITING.equals(table.getState())) {
                         stateText.append(" (").append(table.getTournament().getPlayers().size()).append('/').append(table.getNumberOfSeats()).append(')');
                     }
-                    infoText.append(" Time: ").append(table.getTournament().getOptions().getMatchOptions().getMatchTimeLimit().toString());
-                    if (table.getTournament().getOptions().getMatchOptions().getFreeMulligans() > 0) {
-                        infoText.append(" FM: ").append(table.getTournament().getOptions().getMatchOptions().getFreeMulligans());
+                    MatchOptions tourneyMatchOptions = table.getTournament().getOptions().getMatchOptions();
+                    infoText.append(" Time: ").append(tourneyMatchOptions.getMatchTimeLimit().toString());
+                    infoText.append(" Buffer: ").append(tourneyMatchOptions.getMatchBufferTime().toString());
+                    if (tourneyMatchOptions.getMulliganType() != MulliganType.GAME_DEFAULT) {
+                        infoText.append(" Mulligan: \"").append(tourneyMatchOptions.getMulliganType().toString()).append("\"");
+                    }
+                    if (tourneyMatchOptions.getFreeMulligans() > 0) {
+                        infoText.append(" FM: ").append(tourneyMatchOptions.getFreeMulligans());
+                    }
+                    if (tourneyMatchOptions.isCustomStartLifeEnabled()) {
+                        infoText.append(" StartLife: ").append(tourneyMatchOptions.getCustomStartLife());
+                    }
+                    if (tourneyMatchOptions.isCustomStartHandSizeEnabled()) {
+                        infoText.append(" StartHandSize: ").append(tourneyMatchOptions.getCustomStartHandSize());
                     }
                     if (table.getTournament().getTournamentType().isLimited()) {
                         infoText.append(" Constr.: ").append(table.getTournament().getOptions().getLimitedOptions().getConstructionTime() / 60).append(" Min.");
@@ -160,16 +189,20 @@ public class TableView implements Serializable {
                         DraftOptions draftOptions = (DraftOptions) table.getTournament().getOptions().getLimitedOptions();
                         infoText.append(" Pick time: ").append(draftOptions.getTiming().getShortName());
                     }
-                    if (table.getTournament().getOptions().getMatchOptions().isRollbackTurnsAllowed()) {
+                    if (tourneyMatchOptions.isRollbackTurnsAllowed()) {
                         infoText.append(" RB");
                     }
-                    if (table.getTournament().getOptions().getMatchOptions().isPlaneChase()) {
+                    if (tourneyMatchOptions.isPlaneChase()) {
                         infoText.append(" PC");
+                    }
+                    if (!(table.getTournament().getOptions().getMatchOptions().getPerPlayerEmblemCards().isEmpty())
+                            || !(table.getTournament().getOptions().getMatchOptions().getGlobalEmblemCards().isEmpty())) {
+                        infoText.append(" EC");
                     }
                     if (table.getTournament().getOptions().isWatchingAllowed()) {
                         infoText.append(" SP");
                     }
-                    
+
                     break;
                 case DUELING:
                     stateText.append(" Round: ").append(table.getTournament().getRounds().size());
@@ -182,7 +215,8 @@ public class TableView implements Serializable {
                     break;
                 default:
             }
-            this.additionalInfo = infoText.toString();
+            this.additionalInfoShort = infoText.toString();
+            this.additionalInfoFull = infoText.toString(); // TODO: add tooltip details here
             this.tableStateText = stateText.toString();
             this.deckType = table.getDeckType() + ' ' + table.getTournament().getBoosterInfo();
             this.skillLevel = table.getTournament().getOptions().getMatchOptions().getSkillLevel();
@@ -244,8 +278,12 @@ public class TableView implements Serializable {
         return this.isTournament;
     }
 
-    public String getAdditionalInfo() {
-        return this.additionalInfo;
+    public String getAdditionalInfoShort() {
+        return this.additionalInfoShort;
+    }
+
+    public String getAdditionalInfoFull() {
+        return this.additionalInfoFull;
     }
 
     public String getTableStateText() {

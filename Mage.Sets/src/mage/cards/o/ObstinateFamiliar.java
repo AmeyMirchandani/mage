@@ -52,18 +52,13 @@ class ObstinateFamiliarReplacementEffect extends ReplacementEffectImpl {
         staticText = "If you would draw a card, you may skip that draw instead";
     }
 
-    public ObstinateFamiliarReplacementEffect(final ObstinateFamiliarReplacementEffect effect) {
+    private ObstinateFamiliarReplacementEffect(final ObstinateFamiliarReplacementEffect effect) {
         super(effect);
     }
 
     @Override
     public ObstinateFamiliarReplacementEffect copy() {
         return new ObstinateFamiliarReplacementEffect(this);
-    }
-
-    @Override
-    public boolean apply(Game game, Ability source) {
-        return true;
     }
 
     @Override

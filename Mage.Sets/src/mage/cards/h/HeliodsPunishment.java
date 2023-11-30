@@ -35,7 +35,7 @@ public final class HeliodsPunishment extends CardImpl {
         // Enchant creature
         TargetPermanent auraTarget = new TargetCreaturePermanent();
         this.getSpellAbility().addTarget(auraTarget);
-        this.getSpellAbility().addEffect(new AttachEffect(Outcome.BoostCreature));
+        this.getSpellAbility().addEffect(new AttachEffect(Outcome.Detriment));
         Ability ability = new EnchantAbility(auraTarget);
         this.addAbility(ability);
 
@@ -65,7 +65,7 @@ class HeliodsPunishmentLoseAllAbilitiesEnchantedEffect extends ContinuousEffectI
         staticText = "It loses all abilities and has \"{T}: Remove a task counter from {this}. Then if it has no task counters on it, destroy {this}.\"";
     }
 
-    public HeliodsPunishmentLoseAllAbilitiesEnchantedEffect(final HeliodsPunishmentLoseAllAbilitiesEnchantedEffect effect) {
+    private HeliodsPunishmentLoseAllAbilitiesEnchantedEffect(final HeliodsPunishmentLoseAllAbilitiesEnchantedEffect effect) {
         super(effect);
     }
 
@@ -102,7 +102,7 @@ class HeliodsPunishmentEffect extends OneShotEffect {
         sourceEnchantmentId = null;
     }
 
-    public HeliodsPunishmentEffect(final HeliodsPunishmentEffect effect) {
+    private HeliodsPunishmentEffect(final HeliodsPunishmentEffect effect) {
         super(effect);
         this.sourceEnchantmentId = effect.sourceEnchantmentId;
     }

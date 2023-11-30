@@ -1,7 +1,6 @@
 package org.mage.card.arcane;
 
 import mage.abilities.hint.HintUtils;
-import mage.cards.ArtRect;
 import mage.client.dialog.PreferencesDialog;
 import mage.constants.AbilityType;
 import mage.constants.CardType;
@@ -118,13 +117,7 @@ public abstract class CardRenderer {
     public CardRenderer(CardView card) {
         // Set base parameters
         this.cardView = card;
-
-        if (card.getArtRect() == ArtRect.SPLIT_FUSED) {
-            parseRules(card.getLeftSplitRules(), textboxKeywords, textboxRules);
-            parseRules(card.getRightSplitRules(), textboxKeywords, textboxRules);
-        } else {
-            parseRules(card.getRules(), textboxKeywords, textboxRules);
-        }
+        parseRules(card.getRules(), textboxKeywords, textboxRules);
     }
 
     protected void parseRules(List<String> stringRules, List<TextboxRule> keywords, List<TextboxRule> rules) {
@@ -510,6 +503,10 @@ public abstract class CardRenderer {
 
     protected String getCardSuperTypeLine() {
         StringBuilder spType = new StringBuilder();
+        if (cardView.isToken()) {
+            // "Token" is shown on the type line. As recent printing of tokens do.
+            spType.append("Token ");
+        }
         for (SuperType superType : cardView.getSuperTypes()) {
             spType.append(superType).append(' ');
         }

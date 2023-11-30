@@ -44,18 +44,13 @@ class BoonReflectionEffect extends ReplacementEffectImpl {
         staticText = "If you would gain life, you gain twice that much life instead";
     }
 
-    public BoonReflectionEffect(final BoonReflectionEffect effect) {
+    private BoonReflectionEffect(final BoonReflectionEffect effect) {
         super(effect);
     }
 
     @Override
     public BoonReflectionEffect copy() {
         return new BoonReflectionEffect(this);
-    }
-
-    @Override
-    public boolean apply(Game game, Ability source) {
-        return true;
     }
 
     @Override

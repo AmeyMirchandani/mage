@@ -72,7 +72,9 @@ class AetherspoutsEffect extends OneShotEffect {
     public boolean apply(Game game, Ability source) {
         game.getPlayerList();
         Player controller = game.getPlayer(source.getControllerId());
-        if (controller == null) { return false; }
+        if (controller == null) {
+            return false;
+        }
 
         PlayerList playerList = game.getState().getPlayersInRange(controller.getId(), game);
         playerList.setCurrent(game.getActivePlayerId());
@@ -110,7 +112,7 @@ class AetherspoutsEffect extends OneShotEffect {
                 if (!player.canRespond()) {
                     return false;
                 }
-                player.choose(Outcome.Neutral, cards, target, game);
+                player.choose(Outcome.Neutral, cards, target, source, game);
                 Card card = cards.get(target.getFirstTarget(), game);
                 if (card != null) {
                     cards.remove(card);
@@ -147,7 +149,7 @@ class AetherspoutsEffect extends OneShotEffect {
             }
             target = new TargetCard(Zone.BATTLEFIELD, new FilterCard("order to put on bottom of library (last chosen will be bottommost card)"));
             while (player.canRespond() && cards.size() > 1) {
-                player.choose(Outcome.Neutral, cards, target, game);
+                player.choose(Outcome.Neutral, cards, target, source, game);
 
                 Card card = cards.get(target.getFirstTarget(), game);
                 if (card != null) {

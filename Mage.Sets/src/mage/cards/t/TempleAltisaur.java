@@ -51,7 +51,7 @@ class TempleAltisaurPreventEffect extends PreventionEffectImpl {
         consumable = false;
     }
 
-    public TempleAltisaurPreventEffect(TempleAltisaurPreventEffect effect) {
+    private TempleAltisaurPreventEffect(final TempleAltisaurPreventEffect effect) {
         super(effect);
     }
 
@@ -63,11 +63,6 @@ class TempleAltisaurPreventEffect extends PreventionEffectImpl {
             preventDamageAction(event, source, game);
         }
         return false;
-    }
-
-    @Override
-    public boolean apply(Game game, Ability source) {
-        return true;
     }
 
     @Override

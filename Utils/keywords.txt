@@ -3,7 +3,9 @@ Afterlife|number|
 Annihilator|number|
 Ascend|new|
 Assist|new|
+Backup|card, number|
 Basic landcycling|cost|
+Bargain|new|
 Battle cry|new|
 Bestow|card, manaString|
 Blitz|card, manaString|
@@ -29,6 +31,7 @@ Devoid|color|
 Defender|instance|
 Disturb|cost|
 Dredge|number|
+Doctor's companion|instance|
 Double Strike|instance|
 Dredge|number|
 Echo|manaString|
@@ -53,6 +56,7 @@ Flying|instance|
 Forestcycling|cost|
 Forestwalk|new|
 Foretell|card, manaString|
+For Mirrodin!|new|
 Friends forever|instance|
 Haste|instance|
 Hexproof|instance|
@@ -115,6 +119,7 @@ Suspend|number, cost, card|
 Swampcycling|cost|
 Swampwalk|new|
 Totem armor|new|
+Toxic|number|
 Training|new|
 Trample|instance|
 Tribute|number|
@@ -123,6 +128,7 @@ Undaunted|new|
 Undying|new|
 Unearth|cost|
 Unleash|new|
+Vanishing|number|
 Vigilance|instance|
 Ward|cost|
 Wither|instance|

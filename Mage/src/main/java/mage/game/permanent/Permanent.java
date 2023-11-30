@@ -75,6 +75,10 @@ public interface Permanent extends Card, Controllable {
 
     void setRenowned(boolean value);
 
+    boolean isPrototyped();
+
+    void setPrototyped(boolean value);
+
     int getClassLevel();
 
     /**
@@ -88,6 +92,14 @@ public interface Permanent extends Card, Controllable {
     void addGoadingPlayer(UUID playerId);
 
     Set<UUID> getGoadingPlayers();
+
+    void chooseProtector(Game game, Ability source);
+
+    void setProtectorId(UUID playerId);
+
+    UUID getProtectorId();
+
+    boolean isProtectedBy(UUID playerId);
 
     void setCardNumber(String cid);
 
@@ -107,7 +119,7 @@ public interface Permanent extends Card, Controllable {
 
     int getAttachedToZoneChangeCounter();
 
-    void attachTo(UUID permanentId, Ability source, Game game);
+    void attachTo(UUID attachToObjectId, Ability source, Game game);
 
     void unattach(Game game);
 
@@ -203,8 +215,10 @@ public interface Permanent extends Card, Controllable {
      * @param ability
      * @param sourceId
      * @param game
+     * @return can be null for exists abilities
      */
-    void addAbility(Ability ability, UUID sourceId, Game game);
+    Ability addAbility(Ability ability, UUID sourceId, Game game);
+    Ability addAbility(Ability ability, UUID sourceId, Game game, boolean fromExistingObject);
 
     void removeAllAbilities(UUID sourceId, Game game);
 
@@ -215,6 +229,8 @@ public interface Permanent extends Card, Controllable {
     void incrementLoyaltyActivationsAvailable();
 
     void incrementLoyaltyActivationsAvailable(int max);
+
+    void setLoyaltyActivationsAvailable(int loyaltyActivationsAvailable);
 
     void addLoyaltyUsed();
 
@@ -289,6 +305,8 @@ public interface Permanent extends Card, Controllable {
     boolean canBlock(UUID attackerId, Game game);
 
     boolean canBlockAny(Game game);
+
+    boolean canBeAttacked(UUID attackerId, UUID playerToAttack, Game game);
 
     /**
      * Checks by restriction effects if the permanent can use activated
@@ -406,6 +424,10 @@ public interface Permanent extends Card, Controllable {
     void setManifested(boolean value);
 
     boolean isManifested();
+
+    boolean isRingBearer();
+
+    void setRingBearer(Game game, boolean value);
 
     @Override
     Permanent copy();

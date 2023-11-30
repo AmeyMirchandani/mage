@@ -56,7 +56,7 @@ public final class InallaArchmageRitualist extends CardImpl {
     public InallaArchmageRitualist(UUID ownerId, CardSetInfo setInfo) {
         super(ownerId, setInfo, new CardType[]{CardType.CREATURE}, "{2}{U}{B}{R}");
 
-        addSuperType(SuperType.LEGENDARY);
+        this.supertype.add(SuperType.LEGENDARY);
         this.subtype.add(SubType.HUMAN);
         this.subtype.add(SubType.WIZARD);
         this.power = new MageInt(4);
@@ -66,7 +66,7 @@ public final class InallaArchmageRitualist extends CardImpl {
         Ability ability = new ConditionalInterveningIfTriggeredAbility(
                 new EntersBattlefieldControlledTriggeredAbility(Zone.ALL, new DoIfCostPaid(
                         new InallaArchmageRitualistEffect(), new ManaCostsImpl<>("{1}"), "Pay {1} to create a token copy?"),
-                        filter, false, SetTargetPointer.PERMANENT, ""),
+                        filter, false, SetTargetPointer.PERMANENT),
                 SourceOnBattlefieldOrCommandZoneCondition.instance,
                 "Whenever another nontoken Wizard enters the battlefield under your control, "
                 + "{this} is in the command zone or on the battlefield, "
@@ -98,7 +98,7 @@ class InallaArchmageRitualistEffect extends OneShotEffect {
         this.staticText = "create a token that's a copy of that Wizard. That token gains haste. Exile it at the beginning of the next end step";
     }
 
-    public InallaArchmageRitualistEffect(final InallaArchmageRitualistEffect effect) {
+    private InallaArchmageRitualistEffect(final InallaArchmageRitualistEffect effect) {
         super(effect);
     }
 

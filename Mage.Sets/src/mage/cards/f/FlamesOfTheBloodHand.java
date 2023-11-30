@@ -44,10 +44,10 @@ class FlamesOfTheBloodHandReplacementEffect extends ReplacementEffectImpl {
 
     public FlamesOfTheBloodHandReplacementEffect() {
         super(Duration.EndOfTurn, Outcome.Benefit);
-        staticText = "If that player would gain life this turn, that player gains no life instead";
+        staticText = "If that player or that planeswalker's controller would gain life this turn, that player gains no life instead";
     }
 
-    public FlamesOfTheBloodHandReplacementEffect(final FlamesOfTheBloodHandReplacementEffect effect) {
+    private FlamesOfTheBloodHandReplacementEffect(final FlamesOfTheBloodHandReplacementEffect effect) {
         super(effect);
     }
 
@@ -64,11 +64,6 @@ class FlamesOfTheBloodHandReplacementEffect extends ReplacementEffectImpl {
     @Override
     public boolean applies(GameEvent event, Ability source, Game game) {
         return event.getPlayerId().equals(getTargetPointer().getFirst(game, source));
-    }
-
-    @Override
-    public boolean apply(Game game, Ability source) {
-        return false;
     }
 
     @Override

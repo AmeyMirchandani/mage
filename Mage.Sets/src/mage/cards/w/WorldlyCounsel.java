@@ -50,7 +50,7 @@ class WorldlyCounselEffect extends OneShotEffect {
         this.staticText = "<i>Domain</i> &mdash; Look at the top X cards of your library, where X is the number of basic land types among lands you control. Put one of those cards into your hand and the rest on the bottom of your library in any order";
     }
 
-    public WorldlyCounselEffect(final WorldlyCounselEffect effect) {
+    private WorldlyCounselEffect(final WorldlyCounselEffect effect) {
         super(effect);
     }
 
@@ -74,7 +74,7 @@ class WorldlyCounselEffect extends OneShotEffect {
                 controller.moveCards(cards, Zone.HAND, source, game);
             } else {
                 TargetCard target = new TargetCard(Zone.LIBRARY, new FilterCard("card to put into your hand"));
-                if (controller.choose(Outcome.DrawCard, cards, target, game)) {
+                if (controller.choose(Outcome.DrawCard, cards, target, source, game)) {
                     Card card = cards.get(target.getFirstTarget(), game);
                     if (card != null) {
                         cards.remove(card);

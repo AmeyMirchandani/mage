@@ -73,7 +73,7 @@ class MeasureOfWickednessControlSourceEffect extends ContinuousEffectImpl {
         staticText = "target opponent gains control of {this}";
     }
 
-    public MeasureOfWickednessControlSourceEffect(final MeasureOfWickednessControlSourceEffect effect) {
+    private MeasureOfWickednessControlSourceEffect(final MeasureOfWickednessControlSourceEffect effect) {
         super(effect);
     }
 
@@ -85,7 +85,7 @@ class MeasureOfWickednessControlSourceEffect extends ContinuousEffectImpl {
     @Override
     public boolean apply(Game game, Ability source) {
         Player targetOpponent = game.getPlayer(source.getFirstTarget());
-        Permanent permanent = (Permanent) source.getSourceObjectIfItStillExists(game);
+        Permanent permanent = source.getSourcePermanentIfItStillExists(game);
         if (permanent != null && targetOpponent != null) {
                 permanent.changeControllerId(targetOpponent.getId(), game, source);
         } else {

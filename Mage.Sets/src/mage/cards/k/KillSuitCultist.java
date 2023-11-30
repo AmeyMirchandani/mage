@@ -61,7 +61,7 @@ class KillSuitCultistEffect extends ReplacementEffectImpl {
         staticText = "The next time damage would be dealt to target creature this turn, destroy that creature instead";
     }
 
-    public KillSuitCultistEffect(final KillSuitCultistEffect effect) {
+    private KillSuitCultistEffect(final KillSuitCultistEffect effect) {
         super(effect);
     }
 
@@ -78,11 +78,6 @@ class KillSuitCultistEffect extends ReplacementEffectImpl {
     @Override
     public boolean applies(GameEvent event, Ability source, Game game) {
         return event.getTargetId().equals(targetPointer.getFirst(game, source));
-    }
-
-    @Override
-    public boolean apply(Game game, Ability source) {
-        return true;
     }
 
     @Override

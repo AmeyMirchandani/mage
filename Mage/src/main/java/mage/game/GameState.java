@@ -1,5 +1,6 @@
 package mage.game;
 
+import static java.util.Collections.emptyList;
 import mage.MageObject;
 import mage.MageObjectReference;
 import mage.abilities.*;
@@ -7,6 +8,8 @@ import mage.abilities.effects.ContinuousEffect;
 import mage.abilities.effects.ContinuousEffects;
 import mage.abilities.effects.Effect;
 import mage.cards.*;
+import mage.constants.PhaseStep;
+import mage.constants.TurnPhase;
 import mage.constants.Zone;
 import mage.designations.Designation;
 import mage.filter.common.FilterCreaturePermanent;
@@ -22,6 +25,8 @@ import mage.game.permanent.PermanentCard;
 import mage.game.permanent.PermanentToken;
 import mage.game.stack.SpellStack;
 import mage.game.stack.StackObject;
+import mage.game.turn.Phase;
+import mage.game.turn.Step;
 import mage.game.turn.Turn;
 import mage.game.turn.TurnMods;
 import mage.players.Player;
@@ -37,9 +42,8 @@ import org.apache.log4j.Logger;
 
 import java.io.Serializable;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
-
-import static java.util.Collections.emptyList;
 
 /**
  * @author BetaSteward_at_googlemail.com
@@ -71,9 +75,9 @@ public class GameState implements Serializable, Copyable<GameState> {
     private SpecialActions specialActions;
     private Watchers watchers;
     private Turn turn;
-    private TurnMods turnMods;
+    private TurnMods turnMods; // one time turn modifications (turn, phase or step)
     private UUID activePlayerId; // playerId which turn it is
-    private UUID priorityPlayerId; // player that has currently priority
+    private UUID priorityPlayerId; // player that has currently priority (setup before any choose)
     private UUID playerByOrderId; // player that has currently priority
     private UUID monarchId; // player that is the monarch
     private UUID initiativeId; // player that has the initiative
@@ -86,8 +90,7 @@ public class GameState implements Serializable, Copyable<GameState> {
     private Battlefield battlefield;
     private int turnNum = 1;
     private int stepNum = 0;
-    private UUID turnId = null;
-    private boolean extraTurn = false;
+    private UUID extraTurnId = null; // id of the current extra turn (null on normal turn or after game stopped)
     private boolean gameOver;
     private boolean paused;
     private ContinuousEffects effects;
@@ -98,6 +101,7 @@ public class GameState implements Serializable, Copyable<GameState> {
     private Map<UUID, Zone> zones = new HashMap<>();
     private List<GameEvent> simultaneousEvents = new ArrayList<>();
     private Map<UUID, CardState> cardState = new HashMap<>();
+    private Map<MageObjectReference, Map<String, Object>> permanentCostsTags = new HashMap<>(); // Permanent reference -> map of (tag -> values) describing how the permanent's spell was cast
     private Map<UUID, MageObjectAttribute> mageObjectAttribute = new HashMap<>();
     private Map<UUID, Integer> zoneChangeCounter = new HashMap<>();
     private Map<UUID, Card> copiedCards = new HashMap<>();
@@ -131,7 +135,7 @@ public class GameState implements Serializable, Copyable<GameState> {
         applyEffectsCounter = 0;
     }
 
-    public GameState(final GameState state) {
+    protected GameState(final GameState state) {
         this.players = state.players.copy();
         this.playerList = state.playerList.copy();
         this.choosingPlayerId = state.choosingPlayerId;
@@ -157,38 +161,21 @@ public class GameState implements Serializable, Copyable<GameState> {
         this.battlefield = state.battlefield.copy();
         this.turnNum = state.turnNum;
         this.stepNum = state.stepNum;
-        this.extraTurn = state.extraTurn;
+        this.extraTurnId = state.extraTurnId;
         this.effects = state.effects.copy();
-        for (TriggeredAbility trigger : state.triggered) {
-            this.triggered.add(trigger.copy());
-        }
+        this.triggered = CardUtil.deepCopyObject(state.triggered);
         this.triggers = state.triggers.copy();
         this.delayed = state.delayed.copy();
         this.specialActions = state.specialActions.copy();
         this.combat = state.combat.copy();
         this.turnMods = state.turnMods.copy();
         this.watchers = state.watchers.copy();
-        for (Map.Entry<String, Object> entry : state.values.entrySet()) {
-            if (entry.getValue() instanceof HashSet) {
-                this.values.put(entry.getKey(), ((HashSet) entry.getValue()).clone());
-            } else if (entry.getValue() instanceof EnumSet) {
-                this.values.put(entry.getKey(), ((EnumSet) entry.getValue()).clone());
-            } else if (entry.getValue() instanceof HashMap) {
-                this.values.put(entry.getKey(), ((HashMap) entry.getValue()).clone());
-            } else if (entry.getValue() instanceof List) {
-                this.values.put(entry.getKey(), ((List) entry.getValue()).stream().collect(Collectors.toList()));
-            } else {
-                this.values.put(entry.getKey(), entry.getValue());
-            }
-        }
+        this.values = CardUtil.deepCopyObject(state.values);
         this.zones.putAll(state.zones);
         this.simultaneousEvents.addAll(state.simultaneousEvents);
-        for (Map.Entry<UUID, CardState> entry : state.cardState.entrySet()) {
-            cardState.put(entry.getKey(), entry.getValue().copy());
-        }
-        for (Map.Entry<UUID, MageObjectAttribute> entry : state.mageObjectAttribute.entrySet()) {
-            mageObjectAttribute.put(entry.getKey(), entry.getValue().copy());
-        }
+        this.cardState = CardUtil.deepCopyObject(state.cardState);
+        this.permanentCostsTags = CardUtil.deepCopyObject(state.permanentCostsTags);
+        this.mageObjectAttribute = CardUtil.deepCopyObject(state.mageObjectAttribute);
         this.zoneChangeCounter.putAll(state.zoneChangeCounter);
         this.copiedCards.putAll(state.copiedCards);
         this.permanentOrderNumber = state.permanentOrderNumber;
@@ -224,10 +211,11 @@ public class GameState implements Serializable, Copyable<GameState> {
         companion.clear();
         turnNum = 1;
         stepNum = 0;
-        extraTurn = false;
+        extraTurnId = null;
         gameOver = false;
         specialActions.clear();
         cardState.clear();
+        permanentCostsTags.clear();
         combat.clear();
         turnMods.clear();
         watchers.clear();
@@ -260,7 +248,7 @@ public class GameState implements Serializable, Copyable<GameState> {
         this.battlefield = state.battlefield;
         this.turnNum = state.turnNum;
         this.stepNum = state.stepNum;
-        this.extraTurn = state.extraTurn;
+        this.extraTurnId = state.extraTurnId;
         this.effects = state.effects;
         this.triggered = state.triggered;
         this.triggers = state.triggers;
@@ -277,6 +265,7 @@ public class GameState implements Serializable, Copyable<GameState> {
         this.zones = state.zones;
         this.simultaneousEvents = state.simultaneousEvents;
         this.cardState = state.cardState;
+        this.permanentCostsTags = state.permanentCostsTags;
         this.mageObjectAttribute = state.mageObjectAttribute;
         this.zoneChangeCounter = state.zoneChangeCounter;
         this.copiedCards = state.copiedCards;
@@ -572,6 +561,19 @@ public class GameState implements Serializable, Copyable<GameState> {
         return turn;
     }
 
+    public PhaseStep getTurnStepType() {
+        Turn turn = this.getTurn();
+        Phase phase = turn != null ? turn.getPhase() : null;
+        Step step = phase != null ? phase.getStep() : null;
+        return step != null ? step.getType() : null;
+    }
+
+    public TurnPhase getTurnPhaseType() {
+        Turn turn = this.getTurn();
+        Phase phase = turn != null ? turn.getPhase() : null;
+        return phase != null ? phase.getType() : null;
+    }
+
     public Combat getCombat() {
         return combat;
     }
@@ -598,20 +600,16 @@ public class GameState implements Serializable, Copyable<GameState> {
         this.turnNum = turnNum;
     }
 
-    public UUID getTurnId() {
-        return this.turnId;
+    public UUID getExtraTurnId() {
+        return this.extraTurnId;
     }
 
-    public void setTurnId(UUID turnId) {
-        this.turnId = turnId;
+    public void setExtraTurnId(UUID extraTurnId) {
+        this.extraTurnId = extraTurnId;
     }
 
     public boolean isExtraTurn() {
-        return extraTurn;
-    }
-
-    public void setExtraTurn(boolean extraTurn) {
-        this.extraTurn = extraTurn;
+        return this.extraTurnId != null;
     }
 
     public boolean isGameOver() {
@@ -622,16 +620,23 @@ public class GameState implements Serializable, Copyable<GameState> {
         return this.turnMods;
     }
 
+    /**
+     * Find game scope watcher
+     */
     public <T extends Watcher> T getWatcher(Class<T> watcherClass) {
-        return watcherClass.cast(watchers.get(watcherClass.getSimpleName()));
+        return getWatcher(watcherClass, null);
     }
 
+    /**
+     * Find card/player scope watcher
+     */
     public <T extends Watcher> T getWatcher(Class<T> watcherClass, UUID uuid) {
-        return watcherClass.cast(watchers.get(watcherClass.getSimpleName(), uuid.toString()));
+        String watcherKey = (uuid == null ? "" : uuid.toString()) + watcherClass.getSimpleName();
+        return watcherClass.cast(getWatcher(watcherKey));
     }
 
-    public <T extends Watcher> T getWatcher(Class<T> watcherClass, String prefix) {
-        return watcherClass.cast(watchers.get(watcherClass.getSimpleName(), prefix));
+    public Watcher getWatcher(String key) {
+        return watchers.get(key);
     }
 
     public SpecialActions getSpecialActions() {
@@ -642,10 +647,19 @@ public class GameState implements Serializable, Copyable<GameState> {
         this.gameOver = true;
     }
 
-    // 608.2e
+    /**
+     * Must be called between effects/steps in the ability's resolve
+     * <p>
+     * 608.2e
+     * Some spells and abilities have multiple steps or actions, denoted by separate sentences or clauses,
+     * that involve multiple players. In these cases, the choices for the first action are made in APNAP order,
+     * and then the first action is processed simultaneously. Then the choices for the second action are made in
+     * APNAP order, and then that action is processed simultaneously, and so on. See rule 101.4.
+     */
     public void processAction(Game game) {
         game.getState().handleSimultaneousEvent(game);
         game.applyEffects();
+        game.getState().getTriggers().checkStateTriggers(game);
     }
 
     public void applyEffects(Game game) {
@@ -795,17 +809,88 @@ public class GameState implements Serializable, Copyable<GameState> {
     }
 
     public void addSimultaneousDamage(DamagedEvent damagedEvent, Game game) {
-        boolean flag = false;
+        // Combine multiple damage events in the single event (batch)
+        // * per damage type (see GameEvent.DAMAGED_BATCH_FOR_PERMANENTS, GameEvent.DAMAGED_BATCH_FOR_PLAYERS)
+        // * per player (see GameEvent.DAMAGED_BATCH_FOR_ONE_PLAYER)
+        //
+        // Warning, one event can be stored in multiple batches,
+        // example: DAMAGED_BATCH_FOR_PLAYERS + DAMAGED_BATCH_FOR_ONE_PLAYER
+
+        boolean isPlayerDamage = damagedEvent instanceof DamagedPlayerEvent;
+
+        // existing batch
+        boolean isDamageBatchUsed = false;
+        boolean isPlayerBatchUsed = false;
         for (GameEvent event : simultaneousEvents) {
+
+            // per damage type
             if ((event instanceof DamagedBatchEvent)
                     && ((DamagedBatchEvent) event).getDamageClazz().isInstance(damagedEvent)) {
                 ((DamagedBatchEvent) event).addEvent(damagedEvent);
-                flag = true;
+                isDamageBatchUsed = true;
+            }
+
+            // per player
+            if (isPlayerDamage && event instanceof DamagedBatchForOnePlayerEvent) {
+                DamagedBatchForOnePlayerEvent oldPlayerBatch = (DamagedBatchForOnePlayerEvent) event;
+                if (oldPlayerBatch.getDamageClazz().isInstance(damagedEvent)
+                        && event.getPlayerId().equals(damagedEvent.getTargetId())) {
+                    oldPlayerBatch.addEvent(damagedEvent);
+                    isPlayerBatchUsed = true;
+                }
+            }
+        }
+
+        // new batch
+        if (!isDamageBatchUsed) {
+            addSimultaneousEvent(DamagedBatchEvent.makeEvent(damagedEvent), game);
+        }
+        if (!isPlayerBatchUsed && isPlayerDamage) {
+            DamagedBatchEvent event = new DamagedBatchForOnePlayerEvent(damagedEvent.getTargetId());
+            event.addEvent(damagedEvent);
+            addSimultaneousEvent(event, game);
+        }
+    }
+
+    public void addSimultaneousTapped(TappedEvent tappedEvent, Game game) {
+        // Combine multiple tapped events in the single event (batch)
+
+        boolean isTappedBatchUsed = false;
+        for (GameEvent event : simultaneousEvents) {
+            if (event instanceof TappedBatchEvent) {
+                // Adding to the existing batch
+                ((TappedBatchEvent) event).addEvent(tappedEvent);
+                isTappedBatchUsed = true;
                 break;
             }
         }
-        if (!flag) {
-            addSimultaneousEvent(DamagedBatchEvent.makeEvent(damagedEvent), game);
+
+        // new batch
+        if (!isTappedBatchUsed) {
+            TappedBatchEvent batch = new TappedBatchEvent();
+            batch.addEvent(tappedEvent);
+            addSimultaneousEvent(batch, game);
+        }
+    }
+
+    public void addSimultaneousUntapped(UntappedEvent untappedEvent, Game game) {
+        // Combine multiple untapped events in the single event (batch)
+
+        boolean isUntappedBatchUsed = false;
+        for (GameEvent event : simultaneousEvents) {
+            if (event instanceof UntappedBatchEvent) {
+                // Adding to the existing batch
+                ((UntappedBatchEvent) event).addEvent(untappedEvent);
+                isUntappedBatchUsed = true;
+                break;
+            }
+        }
+
+        // new batch
+        if (!isUntappedBatchUsed) {
+            UntappedBatchEvent batch = new UntappedBatchEvent();
+            batch.addEvent(untappedEvent);
+            addSimultaneousEvent(batch, game);
         }
     }
 
@@ -1078,6 +1163,10 @@ public class GameState implements Serializable, Copyable<GameState> {
         return values.get(valueId);
     }
 
+    public Object computeValueIfAbsent(String valueId, Function<String, ?> mappingFunction) {
+        return values.computeIfAbsent(valueId, mappingFunction);
+    }
+
     /**
      * Return values list starting with searching key.
      * <p>
@@ -1158,8 +1247,6 @@ public class GameState implements Serializable, Copyable<GameState> {
      * @param ability
      */
     public void addOtherAbility(Card attachedTo, Ability ability) {
-        checkWrongDynamicAbilityUsage(attachedTo, ability);
-
         addOtherAbility(attachedTo, ability, true);
     }
 
@@ -1177,6 +1264,12 @@ public class GameState implements Serializable, Copyable<GameState> {
 
         Ability newAbility;
         if (ability instanceof MageSingleton || !copyAbility) {
+            // Avoid adding another instance of an ability where multiple copies are redundant
+            if (attachedTo.getAbilities().contains(ability)
+                    || (getAllOtherAbilities(attachedTo.getId()) != null
+                    && getAllOtherAbilities(attachedTo.getId()).contains(ability))) {
+                return;
+            }
             newAbility = ability;
         } else {
             // must use new id, so you can add multiple instances of the same ability
@@ -1262,6 +1355,29 @@ public class GameState implements Serializable, Copyable<GameState> {
         return mageObjectAtt;
     }
 
+    public Map<MageObjectReference, Map<String, Object>> getPermanentCostsTags() {
+        return permanentCostsTags;
+    }
+
+    /**
+     * Store the tags of source ability using the MOR as a reference
+     */
+    void storePermanentCostsTags(MageObjectReference permanentMOR, Ability source){
+        if (source.getCostsTagMap() != null) {
+            permanentCostsTags.put(permanentMOR, CardUtil.deepCopyObject(source.getCostsTagMap()));
+        }
+    }
+
+    /**
+     * Removes the cost tags if the corresponding permanent is no longer on the battlefield.
+     * Only use if the stack is empty and nothing can refer to them anymore (such as at EOT, the current behavior)
+     */
+    public void cleanupPermanentCostsTags(Game game){
+        getPermanentCostsTags().entrySet().removeIf(entry ->
+                !(entry.getKey().zoneCounterIsCurrent(game))
+        );
+    }
+
     public void addWatcher(Watcher watcher) {
         this.watchers.add(watcher);
     }
@@ -1337,19 +1453,19 @@ public class GameState implements Serializable, Copyable<GameState> {
             copiedParts.add(rightCopied);
             // sync parts
             ((SplitCard) copiedCard).setParts(leftCopied, rightCopied);
-        } else if (copiedCard instanceof ModalDoubleFacesCard) {
+        } else if (copiedCard instanceof ModalDoubleFacedCard) {
             // left
-            ModalDoubleFacesCardHalf leftOriginal = ((ModalDoubleFacesCard) copiedCard).getLeftHalfCard();
-            ModalDoubleFacesCardHalf leftCopied = leftOriginal.copy();
+            ModalDoubleFacedCardHalf leftOriginal = ((ModalDoubleFacedCard) copiedCard).getLeftHalfCard();
+            ModalDoubleFacedCardHalf leftCopied = leftOriginal.copy();
             prepareCardForCopy(leftOriginal, leftCopied, newController);
             copiedParts.add(leftCopied);
             // right
-            ModalDoubleFacesCardHalf rightOriginal = ((ModalDoubleFacesCard) copiedCard).getRightHalfCard();
-            ModalDoubleFacesCardHalf rightCopied = rightOriginal.copy();
+            ModalDoubleFacedCardHalf rightOriginal = ((ModalDoubleFacedCard) copiedCard).getRightHalfCard();
+            ModalDoubleFacedCardHalf rightCopied = rightOriginal.copy();
             prepareCardForCopy(rightOriginal, rightCopied, newController);
             copiedParts.add(rightCopied);
             // sync parts
-            ((ModalDoubleFacesCard) copiedCard).setParts(leftCopied, rightCopied);
+            ((ModalDoubleFacedCard) copiedCard).setParts(leftCopied, rightCopied);
         } else if (copiedCard instanceof AdventureCard) {
             // right
             AdventureCardSpell rightOriginal = ((AdventureCard) copiedCard).getSpellCard();
@@ -1363,10 +1479,16 @@ public class GameState implements Serializable, Copyable<GameState> {
         // main part prepare (must be called after other parts cause it change ids for all)
         prepareCardForCopy(mainCardToCopy, copiedCard, newController);
 
+        // 707.12. An effect that instructs a player to cast a copy of an object (and not just copy a spell) follows the rules for casting spells, except that the copy is created in the same zone the object is in and then cast while another spell or ability is resolving.
+        Zone copyToZone = game.getState().getZone(mainCardToCopy.getId());
+        if (copyToZone == Zone.BATTLEFIELD) {
+            throw new UnsupportedOperationException("Cards cannot be copied while on the Battlefield");
+        }
+
         // add all parts to the game
         copiedParts.forEach(card -> {
             copiedCards.put(card.getId(), card);
-            addCard(card);
+            addCard(card, copyToZone);
         });
 
         // copied cards removes from game after battlefield/stack leaves, so remember it here as workaround to fix freeze, see https://github.com/magefree/mage/issues/5437

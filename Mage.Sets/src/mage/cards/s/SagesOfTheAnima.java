@@ -58,18 +58,13 @@ class SagesOfTheAnimaReplacementEffect extends ReplacementEffectImpl {
                 + "and the rest on the bottom of your library in any order";
     }
 
-    public SagesOfTheAnimaReplacementEffect(final SagesOfTheAnimaReplacementEffect effect) {
+    private SagesOfTheAnimaReplacementEffect(final SagesOfTheAnimaReplacementEffect effect) {
         super(effect);
     }
 
     @Override
     public SagesOfTheAnimaReplacementEffect copy() {
         return new SagesOfTheAnimaReplacementEffect(this);
-    }
-
-    @Override
-    public boolean apply(Game game, Ability source) {
-        return true;
     }
 
     @Override

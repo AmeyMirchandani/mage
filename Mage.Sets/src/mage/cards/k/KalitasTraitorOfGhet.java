@@ -43,7 +43,7 @@ public final class KalitasTraitorOfGhet extends CardImpl {
 
     public KalitasTraitorOfGhet(UUID ownerId, CardSetInfo setInfo) {
         super(ownerId, setInfo, new CardType[]{CardType.CREATURE}, "{2}{B}{B}");
-        this.addSuperType(SuperType.LEGENDARY);
+        this.supertype.add(SuperType.LEGENDARY);
         this.subtype.add(SubType.VAMPIRE);
         this.subtype.add(SubType.WARRIOR);
         this.power = new MageInt(3);
@@ -78,18 +78,13 @@ class KalitasTraitorOfGhetEffect extends ReplacementEffectImpl {
         staticText = "If a nontoken creature an opponent controls would die, instead exile that card and create a 2/2 black Zombie creature token";
     }
 
-    public KalitasTraitorOfGhetEffect(final KalitasTraitorOfGhetEffect effect) {
+    private KalitasTraitorOfGhetEffect(final KalitasTraitorOfGhetEffect effect) {
         super(effect);
     }
 
     @Override
     public KalitasTraitorOfGhetEffect copy() {
         return new KalitasTraitorOfGhetEffect(this);
-    }
-
-    @Override
-    public boolean apply(Game game, Ability source) {
-        return true;
     }
 
     @Override
